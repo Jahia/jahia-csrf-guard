@@ -57,7 +57,7 @@
     <groupId>org.jahia.modules</groupId>
     <artifactId>filter-action</artifactId>
     <name>filter-action</name>
-    <version>1.0-SNAPSHOT</version>    
+    <version>1.0.0-SNAPSHOT</version>    
     <packaging>bundle</packaging>
     <description>This is the custom module (filter-action) for running on a Digital Experience Manager server.</description>
 
