@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 
-    <bean id="filterAction" class="filters.DeleteSiteActionFilter">
+    <bean id="filterAction" class="org.jahia.modules.DeleteSiteActionFilter">
         <property name="matchAllUrls" value="true"/>
     </bean>
 </beans>
