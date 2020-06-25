@@ -21,7 +21,7 @@
  *
  * ==========================================================================================
  */
-package filters;
+package org.jahia.modules;
 
 import org.jahia.bin.filters.AbstractServletFilter;
 
