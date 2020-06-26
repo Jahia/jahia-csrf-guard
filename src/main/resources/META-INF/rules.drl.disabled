@@ -1,4 +1,4 @@
-package org.jahia.modules.filteraction.rules
+package org.jahia.modules.jahiacsrfguard.rules
 
 // list any import classes here.
 import org.jahia.services.content.rules.*
