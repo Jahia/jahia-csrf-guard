@@ -50,7 +50,7 @@
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>7.2.3.1</version>
+        <version>8.0.0.0</version>
     </parent>
 
     <artifactId>jahia-csrf-guard</artifactId>
@@ -65,6 +65,11 @@
         <url>https://github.com/Jahia/jahia-csrf-guard</url>
         <tag>HEAD</tag>
     </scm>
+
+    <properties>
+        <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
+        <jahia-module-signature>MCwCFGWnHXHBQaSeu/32RkbROoOELKdPAhR3g1Sv3g4hEBfXX8594+aXkh4epA==</jahia-module-signature>
+    </properties>
 
     <distributionManagement>
         <repository>
