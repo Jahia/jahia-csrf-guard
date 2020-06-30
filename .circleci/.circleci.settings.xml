@@ -20,6 +20,24 @@
             </repositories>
         </profile>
         <profile>
+            <id>jahia-enterprise-repository</id>
+            <repositories>
+                <repository>
+                    <id>jahia-enterprise</id>
+                    <name>Jahia Enterprise Repository</name>
+                    <url>${env.NEXUS_ENTERPRISE_URL}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
             <id>sonar</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -33,6 +51,7 @@
 
     <activeProfiles>
         <activeProfile>jahia-internal-repository</activeProfile>
+        <activeProfile>jahia-enterprise-repository</activeProfile>
     </activeProfiles>
 
     <servers>
