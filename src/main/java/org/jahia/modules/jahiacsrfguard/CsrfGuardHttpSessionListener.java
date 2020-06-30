@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationListener;
 
 import javax.servlet.http.HttpSession;
 
-public class CsrfGuardHttpSessionListenerWrapper implements ApplicationListener<ApplicationEvent> {
+public class CsrfGuardHttpSessionListener implements ApplicationListener<ApplicationEvent> {
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {

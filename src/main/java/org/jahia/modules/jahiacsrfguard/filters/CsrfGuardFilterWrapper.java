@@ -11,6 +11,7 @@ public class CsrfGuardFilterWrapper extends AbstractServletFilter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        csrfGuardFilter = new CsrfGuardFilter();
         csrfGuardFilter.init(filterConfig);
     }
 
@@ -22,9 +23,5 @@ public class CsrfGuardFilterWrapper extends AbstractServletFilter {
     @Override
     public void destroy() {
         csrfGuardFilter.destroy();
-    }
-
-    public void setCsrfGuardFilter(CsrfGuardFilter csrfGuardFilter) {
-        this.csrfGuardFilter = csrfGuardFilter;
     }
 }
