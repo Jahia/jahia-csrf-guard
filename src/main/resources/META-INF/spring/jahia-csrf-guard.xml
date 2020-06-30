@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean id="csrfGuardServletContextListener" class="org.owasp.csrfguard.CsrfGuardServletContextListener"/>
+    <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardInitializer" init-method="onStart">
+        <property name="csrfGuardServletContextListener" ref="csrfGuardServletContextListener"/>
+    </bean>
 
-    <bean id="filterAction" class="org.jahia.modules.jahiacsrfguard.filters.DeleteSiteActionFilter">
-        <property name="matchAllUrls" value="true"/>
+    <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListenerWrapper"/>
+
+    <bean id="owaspCsrfGuardFilter" class="org.owasp.csrfguard.CsrfGuardFilter"/>
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
+        <property name="csrfGuardFilter" ref="owaspCsrfGuardFilter"/>
+        <property name="urlPatterns" value="*.do"/>
+    </bean>
+
+    <bean id="owaspJavaScriptServlet" class="org.jahia.bin.filters.ServletWrappingFilter">
+        <property name="urlPatterns" value="/JavaScriptServlet"/>
+        <property name="servletName" value="JavaScriptServlet"/>
+        <property name="servletClass" value="org.owasp.csrfguard.servlet.JavaScriptServlet"/>
+        <property name="initParameters">
+            <map key-type="java.lang.String" value-type="java.lang.Boolean">
+                <entry key="inject-into-attributes" value="true"/>
+            </map>
+        </property>
     </bean>
 </beans>
