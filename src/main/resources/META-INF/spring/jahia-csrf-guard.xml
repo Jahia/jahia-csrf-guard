@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xmlns:compendium="http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium/gemini-blueprint-compendium.xsd">
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardInitializer" init-method="onStart"/>
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
-        <property name="urlPatterns" value="*.do"/>
+    <bean id="CsrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
+        <property name="urlPatterns" value="/*"/>
     </bean>
+
+    <compendium:managed-service-factory factory-pid="org.jahia.modules.jahiacsrfguard" interface="org.jahia.modules.jahiacsrfguard.Config" autowire-on-update="true">
+        <bean class="org.jahia.modules.jahiacsrfguard.Config" init-method="init" destroy-method="destroy">
+            <property name="filter" ref="CsrfGuardFilterWrapper"/>
+        </bean>
+    </compendium:managed-service-factory>
 
     <bean id="owaspJavaScriptServlet" class="org.jahia.bin.filters.ServletWrappingFilter">
         <property name="urlPatterns" value="/JavaScriptServlet"/>
