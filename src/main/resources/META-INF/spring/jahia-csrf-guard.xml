@@ -3,19 +3,19 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:compendium="http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-         http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium/gemini-blueprint-compendium.xsd">
+                           http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium http://www.eclipse.org/gemini/blueprint/schema/blueprint-compendium/gemini-blueprint-compendium.xsd">
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardInitializer" init-method="onStart"/>
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
 
-    <bean id="CsrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
+    <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
         <property name="urlPatterns" value="/*"/>
     </bean>
 
     <compendium:managed-service-factory factory-pid="org.jahia.modules.jahiacsrfguard" interface="org.jahia.modules.jahiacsrfguard.Config" autowire-on-update="true">
         <bean class="org.jahia.modules.jahiacsrfguard.Config" init-method="init" destroy-method="destroy">
-            <property name="filter" ref="CsrfGuardFilterWrapper"/>
+            <property name="filter" ref="csrfGuardFilterWrapper"/>
         </bean>
     </compendium:managed-service-factory>
 
@@ -28,5 +28,12 @@
                 <entry key="inject-into-attributes" value="true"/>
             </map>
         </property>
+    </bean>
+
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuarfJSFilter">
+        <property name="priority" value="18"/>
+        <property name="description" value="The CSRF Guard Filter add the csrfguard JS tag to the page, this JS add the CSRF token to the required elements (e.g: form, ajax request, ...)"/>
+        <property name="applyOnConfigurations" value="page,gwt,preview"/>
+        <property name="applyOnTemplateTypes" value="html,html-*"/>
     </bean>
 </beans>
