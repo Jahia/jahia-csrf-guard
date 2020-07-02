@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+/**
+ * This filter will catch all the request that contains both tokens:
+ * ${@link WebflowServletFilter#OWASP_CSRFTOKEN} and ${@link WebflowServletFilter#WEBFLOW_TOKEN}
+ * So it can remove the ${@link WebflowServletFilter#OWASP_CSRFTOKEN} from the request
+ */
 public class WebflowServletFilter extends AbstractServletFilter {
 
     private static final String OWASP_CSRFTOKEN = "OWASP-CSRFTOKEN";
