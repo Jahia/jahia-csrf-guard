@@ -9,10 +9,11 @@ import org.jahia.services.render.filter.RenderChain;
 import java.util.List;
 
 public class CsrfGuarfJSFilter extends AbstractFilter {
+
     @Override
     public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         String output = super.execute(previousOut, renderContext, resource, chain);
-        String jsTagToAdd = "<script src=\"/" + renderContext.getURLGenerator().getContext() + "/JavaScripServlet\"></script>";
+        String jsTagToAdd = "\n<jahia:resource type=\"javascript\" path=\"" + renderContext.getURLGenerator().getContext() + "/JavaScriptServlet\"></jahia:resource>\n<";
         output = addJsTag(output, jsTagToAdd);
         return output;
     }

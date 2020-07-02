@@ -31,9 +31,9 @@
     </bean>
 
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuarfJSFilter">
-        <property name="applyOnConfigurations" value="page,gwt,module,wrapper,wrappedcontent"/>
+        <property name="priority" value="18"/>
+        <property name="description" value="The CSRF Guard Filter add the csrfguard JS tag to the page, this JS add the CSRF token to the required elements (e.g: form, ajax request, ...)"/>
+        <property name="applyOnConfigurations" value="page,gwt,preview"/>
         <property name="applyOnTemplateTypes" value="html,html-*"/>
-        <property name="applyOnModes" value="settings,edit,preview,live"/>
-        <property name="skipOnAjaxRequest" value="true"/>
     </bean>
 </beans>
