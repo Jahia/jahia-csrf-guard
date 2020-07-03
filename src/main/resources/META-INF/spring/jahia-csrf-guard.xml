@@ -30,6 +30,10 @@
         </property>
     </bean>
 
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.WebflowServletFilter">
+        <property name="urlPatterns" value="/*"/>
+    </bean>
+
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuarfJSFilter">
         <property name="priority" value="18"/>
         <property name="description" value="The CSRF Guard Filter add the csrfguard JS tag to the page, this JS add the CSRF token to the required elements (e.g: form, ajax request, ...)"/>
