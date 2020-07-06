@@ -1,4 +1,4 @@
-package org.jahia.modules.jahiacsrfguard.filters;
+package org.jahia.modules.jahiacsrfguard.filters.render;
 
 import org.jahia.modules.jahiacsrfguard.Config;
 import org.jahia.services.render.RenderContext;
@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This filter will remove the ${@link Config#OWASP_CSRFTOKEN} from the actionParameters attribute
+ * This filter will remove the {@link Config#OWASP_CSRFTOKEN} from the actionParameters attribute
  * to avoid an Exception when executing the flow.
- * The actionParameters attribute is set by ${@link org.jahia.services.render.webflow.WebflowAction}
- * and is used in ${@link org.jahia.services.render.webflow.WebflowDispatcherScript}
+ * The actionParameters attribute is set by {@link org.jahia.services.render.webflow.WebflowAction}
+ * and is used in {@link org.jahia.services.render.webflow.WebflowDispatcherScript}
  */
-public class WebflowFilter extends AbstractFilter {
+public class WebflowActionRenderFilter extends AbstractFilter {
     @Override
     public String prepare(RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         Map<String, List<String>> parameters = (Map<String, List<String>>) renderContext.getRequest().getAttribute("actionParameters");

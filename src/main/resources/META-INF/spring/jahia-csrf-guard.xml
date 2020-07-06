@@ -9,7 +9,7 @@
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
 
-    <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper">
+    <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardServletFilterWrapper">
         <property name="urlPatterns" value="/*"/>
     </bean>
 
@@ -30,16 +30,17 @@
         </property>
     </bean>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.filters.WebflowServletFilter">
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.servlet.WebflowServletFilter">
         <property name="urlPatterns" value="/*"/>
     </bean>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.filters.WebflowFilter">
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.render.WebflowActionRenderFilter">
+        <!-- This filter must be executed just before TemplateScriptFilter -->
         <property name="priority" value="98"/>
-        <property name="description" value="This filter clean the request in the render context before execution by Weblfow"/>
+        <property name="description" value="This filter clean the request in the render context before execution by Webflow"/>
     </bean>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuarfJSFilter">
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.render.CsrfGuarfJSRenderFilter">
         <property name="priority" value="18"/>
         <property name="description" value="The CSRF Guard Filter add the csrfguard JS tag to the page, this JS add the CSRF token to the required elements (e.g: form, ajax request, ...)"/>
         <property name="applyOnConfigurations" value="page,gwt,preview"/>

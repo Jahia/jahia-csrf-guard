@@ -1,4 +1,4 @@
-package org.jahia.modules.jahiacsrfguard.filters;
+package org.jahia.modules.jahiacsrfguard.filters.servlet;
 
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.Config;
@@ -11,8 +11,8 @@ import java.util.*;
 
 /**
  * This filter will catch all the request that contains both tokens:
- * ${@link Config#OWASP_CSRFTOKEN} and ${@link WebflowServletFilter#WEBFLOW_TOKEN}
- * So it can remove the ${@link Config#OWASP_CSRFTOKEN} from the request
+ * {@link Config#OWASP_CSRFTOKEN} and {@link WebflowServletFilter#WEBFLOW_TOKEN}
+ * So it can remove the {@link Config#OWASP_CSRFTOKEN} from the request
  */
 public class WebflowServletFilter extends AbstractServletFilter {
 
