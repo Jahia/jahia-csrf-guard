@@ -1,6 +1,6 @@
 package org.jahia.modules.jahiacsrfguard;
 
-import org.jahia.modules.jahiacsrfguard.filters.CsrfGuardFilterWrapper;
+import org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardServletFilterWrapper;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -11,12 +11,14 @@ import java.util.stream.Collectors;
 
 public class Config {
 
-    private CsrfGuardFilterWrapper filter;
+    public static final String OWASP_CSRFTOKEN = "OWASP-CSRFTOKEN";
+
+    private CsrfGuardServletFilterWrapper filter;
 
     private List<Pattern> urlPatterns;
     private List<Pattern> whitelist;
 
-    public void setFilter(CsrfGuardFilterWrapper filter) {
+    public void setFilter(CsrfGuardServletFilterWrapper filter) {
         this.filter = filter;
     }
 

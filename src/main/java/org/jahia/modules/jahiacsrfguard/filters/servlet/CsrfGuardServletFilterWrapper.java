@@ -1,4 +1,4 @@
-package org.jahia.modules.jahiacsrfguard.filters;
+package org.jahia.modules.jahiacsrfguard.filters.servlet;
 
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.Config;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsrfGuardFilterWrapper extends AbstractServletFilter {
+public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     private CsrfGuardFilter csrfGuardFilter;
     private List<Config> configs = new ArrayList<>();
 

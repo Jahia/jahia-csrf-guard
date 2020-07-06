@@ -1,24 +1,21 @@
-package org.jahia.modules.jahiacsrfguard.filters;
+package org.jahia.modules.jahiacsrfguard.filters.servlet;
 
 import org.jahia.bin.filters.AbstractServletFilter;
+import org.jahia.modules.jahiacsrfguard.Config;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * This filter will catch all the request that contains both tokens:
- * ${@link WebflowServletFilter#OWASP_CSRFTOKEN} and ${@link WebflowServletFilter#WEBFLOW_TOKEN}
- * So it can remove the ${@link WebflowServletFilter#OWASP_CSRFTOKEN} from the request
+ * {@link Config#OWASP_CSRFTOKEN} and {@link WebflowServletFilter#WEBFLOW_TOKEN}
+ * So it can remove the {@link Config#OWASP_CSRFTOKEN} from the request
  */
 public class WebflowServletFilter extends AbstractServletFilter {
 
-    private static final String OWASP_CSRFTOKEN = "OWASP-CSRFTOKEN";
     private static final String WEBFLOW_TOKEN = "webflowToken";
 
     @Override
@@ -28,7 +25,7 @@ public class WebflowServletFilter extends AbstractServletFilter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request.getParameterMap().containsKey(WEBFLOW_TOKEN) && request.getParameterMap().containsKey(OWASP_CSRFTOKEN)) {
+        if (request.getParameterMap().containsKey(WEBFLOW_TOKEN) && request.getParameterMap().containsKey(Config.OWASP_CSRFTOKEN)) {
             HttpServletRequest req = new WebflowServletRequestWrapper((HttpServletRequest) request, new HashMap<>(request.getParameterMap()));
             chain.doFilter(req, response);
         } else {
@@ -46,7 +43,7 @@ public class WebflowServletFilter extends AbstractServletFilter {
 
         public WebflowServletRequestWrapper(HttpServletRequest request, Map<String, String[]> parameterMap) {
             super(request);
-            parameterMap.remove(OWASP_CSRFTOKEN);
+            parameterMap.remove(Config.OWASP_CSRFTOKEN);
             this.parameterMap = parameterMap;
         }
 
