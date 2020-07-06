@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 public class Config {
 
+    public static final String OWASP_CSRFTOKEN = "OWASP-CSRFTOKEN";
+
     private CsrfGuardFilterWrapper filter;
 
     private List<Pattern> urlPatterns;
