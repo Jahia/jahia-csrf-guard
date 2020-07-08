@@ -15,7 +15,7 @@ public class CsrfGuarfJSRenderFilter extends AbstractFilter {
     public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         String output = super.execute(previousOut, renderContext, resource, chain);
         String jsTagToAdd = "\n<jahia:resource type=\"javascript\" path=\""
-                + renderContext.getURLGenerator().getContext() + "/JavaScriptServlet\"></jahia:resource>\n";
+                + renderContext.getURLGenerator().getContext() + "/CsrfServlet\"></jahia:resource>\n";
         output += jsTagToAdd;
         return output;
     }
