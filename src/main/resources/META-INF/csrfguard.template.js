@@ -27,6 +27,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 (function() {
+    if (window.csrfguarded) {
+        return;
+    }
+
     /**
      * Code to ensure our event always gets triggered when the DOM is updated.
      * @param obj
@@ -447,6 +451,7 @@
         addEvent(window,'load', function() {
             injectTokens(token_name, token_value);
         });
+        window.csrfguarded = true;
     } else {
         alert("OWASP CSRFGuard JavaScript was included from within an unauthorized domain!");
     }
