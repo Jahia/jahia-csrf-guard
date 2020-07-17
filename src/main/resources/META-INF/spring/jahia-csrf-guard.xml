@@ -9,7 +9,7 @@
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardJavascriptFilter">
+    <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardJavascriptFilter">
         <property name="servletPath" value="/CsrfServlet"/>
         <property name="urlPatterns">
             <list>
@@ -20,7 +20,7 @@
         </property>
     </bean>
 
-    <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardServletFilterWrapper">
+    <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardServletFilterWrapper">
         <property name="urlPatterns" value="/*"/>
     </bean>
 

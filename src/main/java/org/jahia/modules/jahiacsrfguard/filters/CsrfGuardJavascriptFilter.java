@@ -21,7 +21,7 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.jahiacsrfguard.filters.servlet;
+package org.jahia.modules.jahiacsrfguard.filters;
 
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.slf4j.Logger;
