@@ -1,6 +1,6 @@
 package org.jahia.modules.jahiacsrfguard;
 
-import org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardServletFilterWrapper;
+import org.jahia.modules.jahiacsrfguard.filters.CsrfGuardServletFilterWrapper;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
