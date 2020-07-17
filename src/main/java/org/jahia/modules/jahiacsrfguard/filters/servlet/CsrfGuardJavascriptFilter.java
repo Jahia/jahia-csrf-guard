@@ -47,14 +47,17 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private static final Logger logger = LoggerFactory.getLogger(CsrfGuardJavascriptFilter.class);
 
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
-    private static final String SERVLET_PATH = "/CsrfServlet";
+
+    private String servletPath;
 
     @Override
     public void init(FilterConfig filterConfig) {
+        // do nothing
     }
 
     @Override
     public void destroy() {
+        // do nothing
     }
 
     @Override
@@ -86,12 +89,17 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
+    public void setServletPath(String servletPath) {
+        this.servletPath = servletPath;
+    }
+
+    @SuppressWarnings("java:S3457")
     private String buildCodeSnippet(String contextPath) {
-        String src = contextPath + SERVLET_PATH;
+        String src = contextPath + servletPath;
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
-    private static class ResponseWrapper extends HttpServletResponseWrapper {
+    private static final class ResponseWrapper extends HttpServletResponseWrapper {
 
         private final CharArrayWriter writer = new CharArrayWriter();
 

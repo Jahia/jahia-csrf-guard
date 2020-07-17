@@ -10,6 +10,7 @@
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
 
     <bean class="org.jahia.modules.jahiacsrfguard.filters.servlet.CsrfGuardJavascriptFilter">
+        <property name="servletPath" value="/CsrfServlet"/>
         <property name="urlPatterns">
             <list>
                 <value>*.jsp</value>
