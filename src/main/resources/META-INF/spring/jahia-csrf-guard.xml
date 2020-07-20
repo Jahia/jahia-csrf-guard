@@ -7,8 +7,6 @@
 
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardInitializer" init-method="onStart"/>
 
-    <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
-
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardJavascriptFilter">
         <property name="servletPath" value="/CsrfServlet"/>
         <property name="urlPatterns">
