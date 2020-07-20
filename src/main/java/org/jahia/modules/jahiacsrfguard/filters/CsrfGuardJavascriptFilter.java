@@ -24,6 +24,7 @@
 package org.jahia.modules.jahiacsrfguard.filters;
 
 import org.jahia.bin.filters.AbstractServletFilter;
+import org.owasp.csrfguard.CsrfGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.HttpSession;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -70,6 +72,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         ResponseWrapper responseWrapper = new ResponseWrapper(httpResponse);
 
         chain.doFilter(request, responseWrapper);
+
+        HttpSession httpSession = httpRequest.getSession(false);
+        if (httpSession != null) {
+            // Add a token to the session if there isn't one already
+            CsrfGuard csrfGuard = CsrfGuard.getInstance();
+            csrfGuard.updateToken(httpSession);
+        }
 
         String originalContent = responseWrapper.toString();
         Matcher closeHeadTagMatcher = CLOSE_HEAD_TAG_PATTERN.matcher(originalContent);
