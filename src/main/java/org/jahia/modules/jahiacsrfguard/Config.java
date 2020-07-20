@@ -42,7 +42,8 @@ public class Config {
             patternToUse = pattern + (pattern.endsWith("/") ? "*" : "/*");
         }
         patternToUse = patternToUse.replace(".", "\\.");
-        patternToUse = patternToUse.replace("*", ".*");
+        patternToUse = patternToUse.replaceAll("([^\\\\])\\*", "$1.*");
+        patternToUse = patternToUse.replaceAll("^\\*", ".*");
         return Pattern.compile(patternToUse);
     }
 
