@@ -80,7 +80,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             String codeSnippet = buildCodeSnippet(httpRequest.getContextPath());
 
             PrintWriter writer = response.getWriter();
-            writer.write(originalContent.substring(0, indexOfCloseHeadTag - 1));
+            writer.write(originalContent.substring(0, indexOfCloseHeadTag));
             writer.write(codeSnippet);
             writer.write(originalContent.substring(indexOfCloseHeadTag));
 
