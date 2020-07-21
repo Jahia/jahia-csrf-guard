@@ -400,11 +400,8 @@
     }
 
     function isDotDoUrl(url) {
-        if (url.indexOf('?') !== -1) {
-            return url.substring(0, url.indexOf('?')).endsWith('.do');
-        } else {
-            return url.endsWith('.do');
-        }
+        let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
+        return pathPart.endsWith('.do') || pathPart.indexOf('/*') > -1;
     }
 
     /**
