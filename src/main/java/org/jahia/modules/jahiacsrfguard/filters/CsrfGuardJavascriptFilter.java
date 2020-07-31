@@ -95,6 +95,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
             int contentLength = originalContent.length() + codeSnippet.length();
             response.setContentLength(contentLength);
+        } else {
+            response.getWriter().write(originalContent);
         }
     }
 
