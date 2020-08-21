@@ -80,13 +80,13 @@
     }();
 
     /** string utility functions **/
-	function startsWith(s, prefix) {
-		return s.indexOf(prefix) === 0;
-	}
+    function startsWith(s, prefix) {
+        return s.indexOf(prefix) === 0;
+    }
 
-	function endsWith(s, suffix) {
-		return s.substring(s.length - suffix.length) === suffix;
-	}
+    function endsWith(s, suffix) {
+        return s.substring(s.length - suffix.length) === suffix;
+    }
 
     /** hook using standards based prototype **/
     function hijackStandard() {
@@ -293,20 +293,20 @@
         }
 
         var value = tokenValue;
-		var action = form.getAttribute("action");
+        var action = form.getAttribute("action");
 
-		if(action != null && isValidUrl(action) && isDotDoUrl(action)) {
-			var uri = parseUri(action);
-			value = pageTokens[uri] != null ? pageTokens[uri] : tokenValue;
-		}
+        if(action != null && isValidUrl(action) && isDotDoUrl(action)) {
+            var uri = parseUri(action);
+            value = pageTokens[uri] != null ? pageTokens[uri] : tokenValue;
+        }
 
-		var hidden = document.createElement("input");
+        var hidden = document.createElement("input");
 
-		hidden.setAttribute("type", "hidden");
-		hidden.setAttribute("name", tokenName);
-		hidden.setAttribute("value", value);
+        hidden.setAttribute("type", "hidden");
+        hidden.setAttribute("name", tokenName);
+        hidden.setAttribute("value", value);
 
-		form.appendChild(hidden);
+        form.appendChild(hidden);
     }
 
     /** inject tokens as query string parameters into url **/
@@ -359,7 +359,7 @@
                     injectTokenForm(element, tokenName, tokenValue, pageTokens,injectGetForms);
 
                     /** adjust array length after addition of new element **/
-					len = all.length;
+                    len = all.length;
                 }
                 if (injectFormAttributes) {
                     injectTokenAttribute(element, "action", tokenName, tokenValue, pageTokens);
@@ -423,7 +423,7 @@
      */
     if (isValidDomain(document.domain, "%DOMAIN_ORIGIN%")) {
         var token_name = '%TOKEN_NAME%';
-		var token_value = '%TOKEN_VALUE%';
+        var token_value = '%TOKEN_VALUE%';
         /** optionally include Ajax support **/
         if (%INJECT_XHR% == true) {
             if (navigator.appName == "Microsoft Internet Explorer") {
