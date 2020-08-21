@@ -74,20 +74,19 @@
                     if (item[0].detachEvent) {
                         item[0].detachEvent(item[1], item[2]);
                     }
-                    item[0][item[1]] = null;
                 }
             }
         };
     }();
 
     /** string utility functions **/
-    String.prototype.startsWith = function(prefix) {
-        return this.indexOf(prefix) === 0;
-    };
+	function startsWith(s, prefix) {
+		return s.indexOf(prefix) === 0;
+	}
 
-    String.prototype.endsWith = function(suffix) {
-        return this.match(suffix+"$") == suffix;
-    };
+	function endsWith(s, suffix) {
+		return s.substring(s.length - suffix.length) === suffix;
+	}
 
     /** hook using standards based prototype **/
     function hijackStandard() {
@@ -197,9 +196,9 @@
             result = true;
         } else if (%DOMAIN_STRICT% == false) {
             if (target.charAt(0) == '.') {
-                result = current.endsWith(target);
+                result = endsWith(current, target);
             } else {
-                result = current.endsWith('.' + target);
+                result = endsWith(current, '.' + target);
             }
         }
 
@@ -209,6 +208,7 @@
     /** determine if uri/url points to valid domain **/
     function isValidUrl(src) {
         var result = false;
+        var urlStartsWithProtocol = /^[a-zA-Z][a-zA-Z0-9.+-]*:/;
 
         /** parse out domain to make sure it points to our own **/
         if (src.substring(0, 7) == "http://" || src.substring(0, 8) == "https://") {
@@ -233,7 +233,7 @@
         } else if (src.charAt(0) == '#') {
             result = false;
             /** ensure it is a local resource without a protocol **/
-        } else if (!src.startsWith("//") && (src.charAt(0) == '/' || src.indexOf(':') == -1)) {
+        } else if (!startsWith(src, "//") && (src.charAt(0) == '/' || src.search(urlStartsWithProtocol) === -1)) {
             result = true;
         }
 
@@ -292,18 +292,21 @@
             }
         }
 
-        var action = form.getAttribute("action");
+        var value = tokenValue;
+		var action = form.getAttribute("action");
 
-        if (action != null && isValidUrl(action) && isDotDoUrl(action)) {
-            var uri = parseUri(action);
-            var hidden = document.createElement("input");
+		if(action != null && isValidUrl(action) && isDotDoUrl(action)) {
+			var uri = parseUri(action);
+			value = pageTokens[uri] != null ? pageTokens[uri] : tokenValue;
+		}
 
-            hidden.setAttribute("type", "hidden");
-            hidden.setAttribute("name", tokenName);
-            hidden.setAttribute("value", (pageTokens[uri] != null ? pageTokens[uri] : tokenValue));
+		var hidden = document.createElement("input");
 
-            form.appendChild(hidden);
-        }
+		hidden.setAttribute("type", "hidden");
+		hidden.setAttribute("name", tokenName);
+		hidden.setAttribute("value", value);
+
+		form.appendChild(hidden);
     }
 
     /** inject tokens as query string parameters into url **/
@@ -354,6 +357,9 @@
             if (element.tagName.toLowerCase() == "form") {
                 if (injectForms) {
                     injectTokenForm(element, tokenName, tokenValue, pageTokens,injectGetForms);
+
+                    /** adjust array length after addition of new element **/
+					len = all.length;
                 }
                 if (injectFormAttributes) {
                     injectTokenAttribute(element, "action", tokenName, tokenValue, pageTokens);
@@ -416,6 +422,8 @@
      * the token hijacking problem.
      */
     if (isValidDomain(document.domain, "%DOMAIN_ORIGIN%")) {
+        var token_name = '%TOKEN_NAME%';
+		var token_value = '%TOKEN_VALUE%';
         /** optionally include Ajax support **/
         if (%INJECT_XHR% == true) {
             if (navigator.appName == "Microsoft Internet Explorer") {
@@ -432,8 +440,8 @@
 
             var token_pair = xhr.responseText;
             token_pair = token_pair.split(":");
-            var token_name = token_pair[0];
-            var token_value = token_pair[1];
+            token_name = token_pair[0];
+            token_value = token_pair[1];
 
             XMLHttpRequest.prototype.onsend = function(data) {
                 if (isValidUrl(this.url) && isDotDoUrl(this.url)) {
@@ -445,7 +453,7 @@
 
         /** update nodes in DOM after load **/
         addEvent(window,'unload',EventCache.flush);
-        addEvent(window,'load', function() {
+        addEvent(window,'DOMContentLoaded', function() {
             injectTokens(token_name, token_value);
         });
 
