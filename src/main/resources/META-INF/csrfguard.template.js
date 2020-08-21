@@ -292,21 +292,18 @@
             }
         }
 
-        var value = tokenValue;
         var action = form.getAttribute("action");
 
-        if(action != null && isValidUrl(action) && isDotDoUrl(action)) {
+        if (action != null && isValidUrl(action) && isDotDoUrl(action)) {
             var uri = parseUri(action);
-            value = pageTokens[uri] != null ? pageTokens[uri] : tokenValue;
+            var hidden = document.createElement("input");
+
+            hidden.setAttribute("type", "hidden");
+            hidden.setAttribute("name", tokenName);
+            hidden.setAttribute("value", (pageTokens[uri] != null ? pageTokens[uri] : tokenValue));
+
+            form.appendChild(hidden);
         }
-
-        var hidden = document.createElement("input");
-
-        hidden.setAttribute("type", "hidden");
-        hidden.setAttribute("name", tokenName);
-        hidden.setAttribute("value", value);
-
-        form.appendChild(hidden);
     }
 
     /** inject tokens as query string parameters into url **/
