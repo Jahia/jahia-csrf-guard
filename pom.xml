@@ -63,7 +63,7 @@
         <connection>scm:git:git@github.com:Jahia/jahia-csrf-guard.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/jahia-csrf-guard.git</developerConnection>
         <url>https://github.com/Jahia/jahia-csrf-guard</url>
-        <tag>HEAD</tag>
+        <tag>1_x</tag>
     </scm>
 
     <distributionManagement>
