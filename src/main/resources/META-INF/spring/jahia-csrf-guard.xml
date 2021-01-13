@@ -8,7 +8,7 @@
     <bean class="org.jahia.modules.jahiacsrfguard.CsrfGuardInitializer" init-method="onStart"/>
 
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardJavascriptFilter">
-        <property name="servletPath" value="/CsrfServlet"/>
+        <property name="servletPath" value="/modules/CsrfServlet"/>
         <property name="urlPatterns">
             <list>
                 <value>*.jsp</value>
@@ -28,21 +28,10 @@
         </bean>
     </compendium:managed-service-factory>
 
-    <bean id="owaspJavaScriptServlet" class="org.jahia.bin.filters.ServletWrappingFilter">
-        <property name="urlPatterns" value="/CsrfServlet"/>
-        <property name="servletName" value="CsrfServlet"/>
-        <property name="servletClass" value="org.owasp.csrfguard.servlet.JavaScriptServlet"/>
-        <property name="initParameters">
-            <map key-type="java.lang.String" value-type="java.lang.Boolean">
-                <entry key="inject-into-attributes" value="true"/>
-            </map>
-        </property>
-    </bean>
-
     <bean class="org.jahia.ajax.gwt.helper.ModuleGWTResources">
         <property name="javascriptResources">
             <list>
-                <value>/CsrfServlet</value>
+                <value>/modules/CsrfServlet</value>
             </list>
         </property>
     </bean>
