@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.  
+ *
+ */
 public class Config {
 
     private CsrfGuardServletFilterWrapper filter;
@@ -43,10 +47,16 @@ public class Config {
         this.filter = filter;
     }
 
+    /**
+     * Initialize configuration
+     */
     public void init() {
         filter.registerConfig(this);
     }
 
+    /**
+     * Destroy configuration
+     */
     public void destroy() {
         filter.unregisterConfig(this);
     }
@@ -59,6 +69,11 @@ public class Config {
         this.whitelist = Arrays.stream(whitelist.split(",")).map(String::trim).map(Config::createUrlPattern).collect(Collectors.toList());
     }
 
+    /**
+     * Sanitize and compile given regular expression pattern
+     * @param pattern url patterns on which filter should be applied
+     * @return compiled regular expression Pattern object
+     */
     public static Pattern createUrlPattern(String pattern) {
         String patternToUse = pattern;
         if (!pattern.contains("*")) {
@@ -70,6 +85,11 @@ public class Config {
         return Pattern.compile(patternToUse);
     }
 
+    /**
+     * Check url patterns configuration to see whether CsrfGuardFilter should be applied on current request
+     * @param request client request object for servlet
+     * @return true if CsrfGuardFilter should be applied
+     */
     public boolean isFiltered(ServletRequest request) {
         if (urlPatterns == null) {
             return false;
@@ -79,6 +99,11 @@ public class Config {
         return urlPatterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
     }
 
+    /**
+     * Check whitelist configuration to see whether CsrfGuardFilter should not be applied on current request
+     * @param request client request object for servlet
+     * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied 
+     */
     public boolean isWhiteListed(ServletRequest request) {
         if (whitelist == null) {
             return false;

@@ -57,13 +57,16 @@ import org.owasp.csrfguard.servlet.JavaScriptServlet;
 
 /**
  * Service tracker for the HttpService to register the {@link JavaScriptServlet}.
- * 
- * @author Benjamin Papež
  */
+@SuppressWarnings("java:S1149")
 public class HttpServiceTracker extends ServiceTracker<HttpService, HttpService> {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpServiceTracker.class);
 
+    /**
+     * Constructor for OSGI ServiceTracker to add a HttpService
+     * @param context bundle execution context
+     */
     public HttpServiceTracker(BundleContext context) {
         super(context, HttpService.class.getName(), null);
     }
@@ -71,15 +74,16 @@ public class HttpServiceTracker extends ServiceTracker<HttpService, HttpService>
     @Override
     public HttpService addingService(ServiceReference<HttpService> reference) {
         HttpService httpService = super.addingService(reference);
-        if (httpService == null)
+        if (httpService == null) {
             return null;
+        }
 
         try {
             Dictionary<String, Object> initParams = new Hashtable<>();
             initParams.put("inject-into-attributes", true);
             httpService.registerServlet("/CsrfServlet", new JavaScriptServlet(), initParams, null);
         } catch (Exception e) {
-            logger.error("Cannot register Servlet",e);
+            logger.error("Cannot register CsrfServlet", e);
         }
 
         return httpService;
