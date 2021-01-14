@@ -28,6 +28,9 @@ import org.owasp.csrfguard.log.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Logger implementation for CsrfGuard
+ */
 public class CsrfGuardLogger implements ILogger {
     private static final long serialVersionUID = 5581329713949000954L;
     private static final Logger logger = LoggerFactory.getLogger("Owasp.CsrfGuard");
