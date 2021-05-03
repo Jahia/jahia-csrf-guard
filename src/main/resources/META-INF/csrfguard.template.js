@@ -84,7 +84,7 @@
         return s.indexOf(prefix) === 0;
     }
 
-    function endsWith(s, suffix) {
+        function endsWith(s, suffix) {
         return s.substring(s.length - suffix.length) === suffix;
     }
 
@@ -408,7 +408,7 @@
 
     function isDotDoUrl(url) {
         let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
-        return pathPart.endsWith('.do') || pathPart.indexOf('/*') > -1;
+        return endsWith(pathPart, '.do') || pathPart.indexOf('/*') > -1;
     }
 
     /**
