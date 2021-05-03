@@ -84,7 +84,7 @@
         return s.indexOf(prefix) === 0;
     }
 
-    function endsWith(s, suffix) {
+        function endsWith(s, suffix) {
         return s.substring(s.length - suffix.length) === suffix;
     }
 
@@ -407,20 +407,8 @@
     }
 
     function isDotDoUrl(url) {
-        if (!String.prototype.endsWith) {
-            String.prototype.endsWith = function(searchString, position) {
-                var subjectString = this.toString();
-                if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-                    position = subjectString.length;
-                }
-                position -= searchString.length;
-                var lastIndex = subjectString.lastIndexOf(searchString, position);
-                return lastIndex !== -1 && lastIndex === position;
-            };
-        }		
-		
         let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
-        return pathPart.endsWith('.do') || pathPart.indexOf('/*') > -1;
+        return endsWith(pathPart, '.do') || pathPart.indexOf('/*') > -1;
     }
 
     /**
