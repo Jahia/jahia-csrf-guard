@@ -23,7 +23,10 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
+import org.jahia.bin.filters.CompositeFilter;
+import org.jahia.services.render.URLResolver;
 import org.owasp.csrfguard.CsrfGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
     private String servletPath;
+    private String[] resolvedUrlPatterns;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -72,6 +76,22 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         ResponseWrapper responseWrapper = new ResponseWrapper(httpResponse);
 
         chain.doFilter(request, responseWrapper);
+        String originalContent = responseWrapper.toString();
+        int length = httpRequest.getContextPath().length();
+        String requestPath = length > 0 ? httpRequest.getRequestURI().substring(length) : httpRequest.getRequestURI();
+
+        // skip filter if not html content type of if path from the request or url resolver not match one of the provided patterns.
+        if (!matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
+            logger.debug("Not adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
+            // In case of files, the response is already committed and cannot be overwritten.
+            if (!response.isCommitted()) {
+                response.getWriter().write(originalContent);
+            } else if (originalContent.length() > 0) {
+                logger.warn("Response from {} has content that could not be written because the response has been already committed", httpRequest.getRequestURI());
+                logger.debug("Response content is {}", originalContent);
+            }
+            return;
+        }
 
         HttpSession httpSession = httpRequest.getSession(false);
         if (httpSession != null) {
@@ -80,7 +100,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             csrfGuard.updateToken(httpSession);
         }
 
-        String originalContent = responseWrapper.toString();
         Matcher closeHeadTagMatcher = CLOSE_HEAD_TAG_PATTERN.matcher(originalContent);
         if (closeHeadTagMatcher.find()) {
             logger.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
@@ -100,8 +119,30 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
+    private boolean matchHtmlContentType(HttpServletResponse response) {
+        return StringUtils.contains(response.getContentType(), "text/html");
+    }
+
+    private boolean matchUrlResolverPattern(HttpServletRequest httpRequest) {
+        URLResolver urlResolver = (URLResolver) httpRequest.getAttribute("urlResolver");
+        return urlResolver != null  && matchPattern(urlResolver.getPath());
+    }
+
+    private boolean matchPattern(String requestPath) {
+        for (String testPath : resolvedUrlPatterns) {
+            if (CompositeFilter.matchFiltersURL(testPath, requestPath)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void setServletPath(String servletPath) {
         this.servletPath = servletPath;
+    }
+
+    public void setResolvedUrlPatterns(String[] resolvedUrlPatterns) {
+        this.resolvedUrlPatterns = resolvedUrlPatterns;
     }
 
     @SuppressWarnings("java:S3457")
