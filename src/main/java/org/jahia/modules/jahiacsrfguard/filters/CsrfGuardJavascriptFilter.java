@@ -120,7 +120,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     private boolean matchHtmlContentType(HttpServletResponse response) {
-        return StringUtils.contains(response.getContentType(),"text/html");
+        return StringUtils.contains(response.getContentType(), "text/html");
     }
 
     private boolean matchUrlResolverPattern(HttpServletRequest httpRequest) {
