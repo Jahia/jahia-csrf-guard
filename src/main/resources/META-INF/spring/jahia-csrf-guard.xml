@@ -7,13 +7,21 @@
 
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardJavascriptFilter">
         <property name="servletPath" value="/modules/CsrfServlet"/>
-        <property name="urlPatterns">
+        <property name="resolvedUrlPatterns">
             <list>
                 <value>*.jsp</value>
                 <value>*.html</value>
                 <value>*.htm</value>
             </list>
         </property>
+        <property name="urlPatterns" value="/*"/>
+        <property name="dispatcherTypes">
+            <set>
+                <value>REQUEST</value>
+                <value>FORWARD</value>
+            </set>
+        </property>
+        <property name="order" value="1.1"/> <!-- Set to be after SEO URL Rewrite filter -->
     </bean>
 
     <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardServletFilterWrapper">
