@@ -76,6 +76,10 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         ResponseWrapper responseWrapper = new ResponseWrapper(httpResponse);
 
         chain.doFilter(request, responseWrapper);
+        // the original response output stream has been used, or the writer not used do nothing
+        if (responseWrapper.isStreamUsed() || !responseWrapper.isWriterUsed()) {
+            return;
+        }
         String originalContent = responseWrapper.toString();
         int length = httpRequest.getContextPath().length();
         String requestPath = length > 0 ? httpRequest.getRequestURI().substring(length) : httpRequest.getRequestURI();
@@ -84,11 +88,11 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         if (!matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
             logger.debug("Not adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
             // In case of files, the response is already committed and cannot be overwritten.
-            if (!response.isCommitted()) {
+            try {
                 response.getWriter().write(originalContent);
-            } else if (originalContent.length() > 0) {
-                logger.warn("Response from {} has content that could not be written because the response has been already committed", httpRequest.getRequestURI());
-                logger.debug("Response content is {}", originalContent);
+            } catch (Exception e) {
+                logger.warn("Response from {} has content that could not be written, set this class in debug for more details", httpRequest.getRequestURI());
+                logger.debug("Response content is {}", originalContent, e);
             }
             return;
         }
@@ -154,6 +158,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private static final class ResponseWrapper extends HttpServletResponseWrapper {
 
         private final CharArrayWriter writer = new CharArrayWriter();
+        private boolean streamUsed = false;
+        private boolean writerUsed = false;
 
         ResponseWrapper(HttpServletResponse response) {
             super(response);
@@ -161,7 +167,14 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
         @Override
         public PrintWriter getWriter() throws IOException {
+            writerUsed = true;
             return new PrintWriter(writer);
+        }
+
+        @Override
+        public ServletOutputStream getOutputStream() throws IOException {
+            streamUsed = true;
+            return super.getOutputStream();
         }
 
         @Override
@@ -169,6 +182,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             return writer.toString();
         }
 
+        public boolean isStreamUsed() {
+            return streamUsed;
+        }
+
+        public boolean isWriterUsed() {
+            return writerUsed;
+        }
     }
 
 }
