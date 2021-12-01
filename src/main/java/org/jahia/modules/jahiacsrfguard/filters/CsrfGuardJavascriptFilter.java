@@ -101,7 +101,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         if (httpSession != null) {
             // Add a token to the session if there isn't one already
             CsrfGuard csrfGuard = CsrfGuard.getInstance();
-            csrfGuard.updateToken(httpSession);
+//            csrfGuard.updateToken(httpSession);
         }
 
         Matcher closeHeadTagMatcher = CLOSE_HEAD_TAG_PATTERN.matcher(originalContent);
