@@ -47,8 +47,9 @@
     </scm>
 
     <properties>
+        <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
-        <jahia-module-signature>MC4CFQCJpWEhNQ/DqsRoE2tmnqethOFJfQIVAJL7EXIwFk0pFikMIcaJ9Hsk+CXo</jahia-module-signature>
+        <jahia-module-signature>MC0CFQCGxSwdnRXWwnKosf00lh6oIS3VXwIUMDlZ5ongeJldipIga6H5lRM/Fxo=</jahia-module-signature>
     </properties>
 
     <repositories>
@@ -80,6 +81,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.gemini.blueprint</groupId>
+            <artifactId>gemini-blueprint-core</artifactId>
+            <version>${gemini.blueprint.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard</artifactId>
             <version>3.1.0</version>
@@ -94,8 +101,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.jahia.modules.jahiacsrfguard.Activator</Bundle-Activator>
                         <Jahia-Depends>default</Jahia-Depends>
+                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
