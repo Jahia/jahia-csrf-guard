@@ -84,7 +84,7 @@
         return s.indexOf(prefix) === 0;
     }
 
-        function endsWith(s, suffix) {
+    function endsWith(s, suffix) {
         return s.substring(s.length - suffix.length) === suffix;
     }
 
