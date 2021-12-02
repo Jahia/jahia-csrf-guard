@@ -37,9 +37,10 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 	}
 
 	/**
-	 * 
+	 * Default constructor
 	 */
 	public ConfigurationOverlayProvider() {
+	 // nothing needs to be done for now
 	}
 
 	/**
@@ -55,6 +56,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 	 */
 	@Override
 	public void clearCachedCalculatedValues() {
+	 // There are no calculated values in our configuration.
 	}
 
 	/**
@@ -90,16 +92,16 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 			//is the main config file there?
 			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(OWASP_CSRF_GUARD_PROPERTIES);
 			if (inputStream != null) {
-				mainExampleConfigClasspath = OWASP_CSRF_GUARD_PROPERTIES;
+			    setMainExampleConfigClassPath(OWASP_CSRF_GUARD_PROPERTIES);
 				CsrfGuardUtils.closeQuietly(inputStream);
 			} else {
 				inputStream = getClass().getClassLoader().getResourceAsStream(META_INF_CSRFGUARD_PROPERTIES);
 				if (inputStream != null) {
-					mainExampleConfigClasspath = META_INF_CSRFGUARD_PROPERTIES;
+				    setMainExampleConfigClassPath(META_INF_CSRFGUARD_PROPERTIES);
 					CsrfGuardUtils.closeQuietly(inputStream);
 				} else {
 					//hmm, its not there, but use it anyways
-					mainExampleConfigClasspath = OWASP_CSRF_GUARD_PROPERTIES;
+				    setMainExampleConfigClassPath(OWASP_CSRF_GUARD_PROPERTIES);
 				}
 			}
 			
@@ -108,6 +110,10 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 		//generally this is Owasp.CsrfGuard.properties
 		return ConfigPropertiesCascadeCommonUtils.defaultIfBlank(CsrfGuardServletContextListener.getConfigFileName(), 
 				mainExampleConfigClasspath);
+	}
+	
+	private static void setMainExampleConfigClassPath(String configClassPath) {
+	    mainExampleConfigClasspath = configClassPath;
 	}
 
     @Override

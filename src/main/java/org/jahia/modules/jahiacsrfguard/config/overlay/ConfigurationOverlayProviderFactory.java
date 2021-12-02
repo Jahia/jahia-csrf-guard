@@ -13,9 +13,10 @@ public class ConfigurationOverlayProviderFactory implements
 		ConfigurationProviderFactory {
 
 	/**
-	 * 
+	 * Default constructor
 	 */
 	public ConfigurationOverlayProviderFactory() {
+	    // nothing needs to be done for now
 	}
 
 	/**

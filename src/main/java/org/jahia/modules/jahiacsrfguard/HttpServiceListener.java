@@ -54,7 +54,11 @@ public class HttpServiceListener implements BundleContextAware {
     public void setJavaScriptServlet(JavaScriptServlet javaScriptServlet) {
         this.javaScriptServlet = javaScriptServlet;
     }
-
+    
+    /**
+     * @param serviceReference The passed service reference, but it is a proxy class that we cannot use to retrieve the
+                               real service object, so we simply look it up again
+     */
     public void onBind(ServiceReference serviceReference) {
         ServiceReference realServiceReference = bundleContext.getServiceReference(HttpService.class.getName());
         HttpService httpService = (HttpService) bundleContext.getService(realServiceReference);
