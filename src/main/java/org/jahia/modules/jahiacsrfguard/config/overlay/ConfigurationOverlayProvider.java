@@ -120,7 +120,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
     protected ConfigPropertiesCascadeBase retrieveFromConfigFiles() {
         ConfigPropertiesCascadeBase result = super.retrieveFromConfigFiles();
         ConfigurationOverlay osgiConfigOVerlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
-        if (osgiConfigOVerlay != null) {
+        if (osgiConfigOVerlay != null && osgiConfigOVerlay.getOverlayProperties() != null) {
             result.propertiesOverrideMap().putAll(osgiConfigOVerlay.getOverlayProperties());
         }
         return result;
