@@ -119,18 +119,18 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
     @Override
     protected ConfigPropertiesCascadeBase retrieveFromConfigFiles() {
         ConfigPropertiesCascadeBase result = super.retrieveFromConfigFiles();
-        ConfigurationOverlay osgiConfigOVerlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
-        if (osgiConfigOVerlay != null && osgiConfigOVerlay.getOverlayProperties() != null) {
-            result.propertiesOverrideMap().putAll(osgiConfigOVerlay.getOverlayProperties());
+        ConfigurationOverlay osgiConfigOverlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
+        if (osgiConfigOverlay != null && osgiConfigOverlay.getOverlayProperties() != null) {
+            result.propertiesOverrideMap().putAll(osgiConfigOverlay.getOverlayProperties());
         }
         return result;
     }
 
     @Override
     protected boolean filesNeedReloadingBasedOnContents() {
-        ConfigurationOverlay osgiConfigOVerlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
-        if (osgiConfigOVerlay != null && osgiConfigOVerlay.getOverlayProperties() != null && (propertiesOverrideMap() == null
-                || !osgiConfigOVerlay.getOverlayProperties().equals(propertiesOverrideMap()))) {
+        ConfigurationOverlay osgiConfigOverlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
+        if (osgiConfigOverlay != null && osgiConfigOverlay.getOverlayProperties() != null && (propertiesOverrideMap() == null
+                || !osgiConfigOverlay.getOverlayProperties().equals(propertiesOverrideMap()))) {
             return true;
         }
         return super.filesNeedReloadingBasedOnContents();
