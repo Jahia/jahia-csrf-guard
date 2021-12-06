@@ -19,6 +19,10 @@ public class ConfigurationOverlay implements ManagedService {
     
     @Override
     public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        if (properties == null) {
+            overlayProperties = null;
+            return;
+        }
         Map<String, String> csrfGuardProperties = new HashMap<>();
         Enumeration<String> keys = properties.keys();
         while (keys.hasMoreElements()) {
