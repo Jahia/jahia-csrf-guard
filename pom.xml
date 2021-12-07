@@ -47,6 +47,7 @@
     </scm>
 
     <properties>
+        <jahia.plugin.version>6.0-SNAPSHOT</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
         <jahia-module-signature>MC0CFQCGxSwdnRXWwnKosf00lh6oIS3VXwIUMDlZ5ongeJldipIga6H5lRM/Fxo=</jahia-module-signature>
@@ -89,7 +90,25 @@
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard</artifactId>
-            <version>3.1.0</version>
+            <version>4.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+			        <groupId>org.slf4j</groupId>
+			        <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -98,7 +117,15 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.2</version> 
                 <extensions>true</extensions>
+                <dependencies> 
+                    <dependency> 
+                        <groupId>biz.aQute.bnd</groupId>
+                        <artifactId>biz.aQute.bndlib</artifactId> 
+                        <version>6.1.0</version> 
+                    </dependency> 
+                </dependencies> 
                 <configuration>
                     <instructions>
                         <Jahia-Depends>default</Jahia-Depends>

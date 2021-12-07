@@ -2,12 +2,11 @@ package org.jahia.modules.jahiacsrfguard.config.overlay;
 
 import java.io.InputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jahia.osgi.BundleUtils;
 import org.owasp.csrfguard.CsrfGuardServletContextListener;
 import org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeBase;
 import org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeCommonUtils;
-import org.owasp.csrfguard.util.CsrfGuardUtils;
-
 
 /**
  * Use configuration overlays that use the base properties as a default, and then decorate with an overlay file
@@ -52,14 +51,6 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 	}
 
 	/**
-	 * @see org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeBase#clearCachedCalculatedValues()
-	 */
-	@Override
-	public void clearCachedCalculatedValues() {
-	 // There are no calculated values in our configuration.
-	}
-
-	/**
 	 * @see org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeBase#getMainConfigClasspath()
 	 */
 	@Override
@@ -93,12 +84,12 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(OWASP_CSRF_GUARD_PROPERTIES);
 			if (inputStream != null) {
 			    setMainExampleConfigClassPath(OWASP_CSRF_GUARD_PROPERTIES);
-				CsrfGuardUtils.closeQuietly(inputStream);
+			    ConfigPropertiesCascadeCommonUtils.closeQuietly(inputStream);
 			} else {
 				inputStream = getClass().getClassLoader().getResourceAsStream(META_INF_CSRFGUARD_PROPERTIES);
 				if (inputStream != null) {
 				    setMainExampleConfigClassPath(META_INF_CSRFGUARD_PROPERTIES);
-					CsrfGuardUtils.closeQuietly(inputStream);
+				    ConfigPropertiesCascadeCommonUtils.closeQuietly(inputStream);
 				} else {
 					//hmm, its not there, but use it anyways
 				    setMainExampleConfigClassPath(OWASP_CSRF_GUARD_PROPERTIES);
@@ -108,8 +99,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 		}
 		
 		//generally this is Owasp.CsrfGuard.properties
-		return ConfigPropertiesCascadeCommonUtils.defaultIfBlank(CsrfGuardServletContextListener.getConfigFileName(), 
-				mainExampleConfigClasspath);
+		return StringUtils.defaultIfBlank(CsrfGuardServletContextListener.getConfigFileName(), mainExampleConfigClasspath);
 	}
 	
 	private static void setMainExampleConfigClassPath(String configClassPath) {
