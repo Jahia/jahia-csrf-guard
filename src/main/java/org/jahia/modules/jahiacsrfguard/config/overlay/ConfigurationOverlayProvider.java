@@ -1,6 +1,8 @@
 package org.jahia.modules.jahiacsrfguard.config.overlay;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jahia.osgi.BundleUtils;
@@ -110,8 +112,9 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
     protected ConfigPropertiesCascadeBase retrieveFromConfigFiles() {
         ConfigPropertiesCascadeBase result = super.retrieveFromConfigFiles();
         ConfigurationOverlay osgiConfigOverlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
-        if (osgiConfigOverlay != null && osgiConfigOverlay.getOverlayProperties() != null) {
-            result.propertiesOverrideMap().putAll(osgiConfigOverlay.getOverlayProperties());
+        if (osgiConfigOverlay != null) {
+            Map<String, String> overlayProperties = osgiConfigOverlay.getOverlayProperties();
+            result.propertiesOverrideMap().putAll(overlayProperties != null ? overlayProperties : Collections.emptyMap());
         }
         return result;
     }
@@ -120,7 +123,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
     protected boolean filesNeedReloadingBasedOnContents() {
         ConfigurationOverlay osgiConfigOverlay = BundleUtils.getOsgiService(ConfigurationOverlay.class, null);
         if (osgiConfigOverlay != null && osgiConfigOverlay.getOverlayProperties() != null && (propertiesOverrideMap() == null
-                || !osgiConfigOverlay.getOverlayProperties().equals(propertiesOverrideMap()))) {
+                || !propertiesOverrideMap().equals(osgiConfigOverlay.getOverlayProperties()))) {
             return true;
         }
         return super.filesNeedReloadingBasedOnContents();

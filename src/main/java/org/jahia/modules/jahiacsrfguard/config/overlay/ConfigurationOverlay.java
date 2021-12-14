@@ -2,8 +2,8 @@ package org.jahia.modules.jahiacsrfguard.config.overlay;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -23,7 +23,7 @@ public class ConfigurationOverlay implements ManagedService {
             overlayProperties = null;
             return;
         }
-        Map<String, String> csrfGuardProperties = new HashMap<>();
+        Map<String, String> csrfGuardProperties = new ConcurrentHashMap<>();
         Enumeration<String> keys = properties.keys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
