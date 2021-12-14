@@ -37,6 +37,10 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
     (function () {
         owaspCSRFGuardScriptHasLoaded = true;
 
+        if (window.csrfguarded) {
+            return;
+        }
+
         /**
          * Code to ensure our event always gets triggered when the DOM is updated.
          * @param obj
@@ -214,6 +218,11 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             window.XMLHttpRequest = initXMLHttpRequest;
         }
 
+       function isDotDoUrl(url) {
+            let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
+            return endsWith(pathPart,'.do') ||  pathPart.indexOf('/*') > -1;
+        }
+
         /**
          *  check if valid domain based on domainStrict
          */
@@ -351,7 +360,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             var value = tokenValue;
             var action = form.getAttribute('action');
 
-            if (action !== null && isValidUrl(action)) {
+            if (action !== null && isValidUrl(action) && isDotDoUrl(action)) {
                 var uri = parseUri(action);
                 const calculatedPageToken = calculatePageTokenForUri(pageTokens, uri);
                 value = calculatedPageToken == null ? tokenValue : calculatedPageToken;
@@ -395,7 +404,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
 
             const location = element.getAttribute && element.getAttribute(attr);
 
-            if (location != null && isValidUrl(location) && !isUnprotectedExtension(location)) {
+            if (location != null && isValidUrl(location) && isDotDoUrl(location) && !isUnprotectedExtension(location)) {
                 const uri = parseUri(location);
                 const calculatedPageToken = calculatePageTokenForUri(pageTokens, uri);
                 const value = calculatedPageToken == null ? tokenValue : calculatedPageToken;
@@ -691,7 +700,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                         return normalizedUrl;
                     }
 
-                    if (isValidUrl(this.url)) {
+                    if (isValidUrl(this.url) && isDotDoUrl(this.url)) {
                         this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
                         let normalizedUrl = normalizeUrl(this.url);
@@ -734,6 +743,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     injectTokens(tokenName, masterTokenValue, {});
                 });
             }
+            window.csrfguarded = true;
         } else {
             alert('OWASP CSRFGuard JavaScript was included from within an unauthorized domain!');
         }
