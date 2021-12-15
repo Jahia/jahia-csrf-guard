@@ -333,6 +333,8 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     }
                 } else if (pageTokenKey.startsWith('/*')) { // full path wildcard path matching
                     value = pageToken;
+                } else if (uri.startsWith(`%CONTEXT_PATH%`) && pageTokenKey.endsWith(uri.substring("%CONTEXT_PATH%".length))) { // Jahia case as we can't add the context to the uri
+                    value = pageToken;
                 } else if (pageTokenKey.endsWith('/*') || pageTokenKey.startsWith('.*')) { // 'partial path wildcard' and 'extension' matching
                     // TODO implement
                     console.warn("'Extension' and 'partial path wildcard' matching for page tokens is not supported properly yet! " +
