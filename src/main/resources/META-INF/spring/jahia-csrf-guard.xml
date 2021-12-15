@@ -39,6 +39,14 @@
     <osgi:reference id="httpService" interface="org.osgi.service.http.HttpService">
         <osgi:listener ref="httpServiceListener" bind-method="onBind" unbind-method="onUnbind" />
     </osgi:reference>
+    
+    <bean id="csrfHttpSessionListener" class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
+	<osgi:service ref="csrfHttpSessionListener">
+		<osgi:interfaces>
+            <value>org.jahia.bin.listeners.HttpListener</value>
+			<value>javax.servlet.http.HttpSessionListener</value>
+		</osgi:interfaces>
+	</osgi:service>
 
     <compendium:managed-service-factory factory-pid="org.jahia.modules.jahiacsrfguard" interface="org.jahia.modules.jahiacsrfguard.Config" autowire-on-update="true">
         <bean class="org.jahia.modules.jahiacsrfguard.Config" init-method="init" destroy-method="destroy">
