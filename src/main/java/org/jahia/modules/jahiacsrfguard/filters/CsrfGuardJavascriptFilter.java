@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.bin.filters.CompositeFilter;
 import org.jahia.services.render.URLResolver;
-import org.owasp.csrfguard.CsrfGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.http.HttpSession;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -95,13 +93,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
                 logger.debug("Response content is {}", originalContent, e);
             }
             return;
-        }
-
-        HttpSession httpSession = httpRequest.getSession(false);
-        if (httpSession != null) {
-            // Add a token to the session if there isn't one already
-            CsrfGuard csrfGuard = CsrfGuard.getInstance();
-            csrfGuard.updateToken(httpSession);
         }
 
         Matcher closeHeadTagMatcher = CLOSE_HEAD_TAG_PATTERN.matcher(originalContent);

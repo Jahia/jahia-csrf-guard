@@ -21,35 +21,30 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.jahiacsrfguard.config.overlay;
+package org.jahia.modules.jahiacsrfguard;
 
-import java.util.Properties;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
 
-import org.owasp.csrfguard.config.ConfigurationProvider;
-import org.owasp.csrfguard.config.ConfigurationProviderFactory;
-import org.owasp.csrfguard.config.PropertiesConfigurationProvider;
+import org.jahia.bin.listeners.HttpListener;
+import org.owasp.csrfguard.CsrfGuard;
+import org.owasp.csrfguard.session.ContainerSession;
+import org.owasp.csrfguard.session.LogicalSession;
 
-/**
- *
- */
-public class ConfigurationOverlayProviderFactory implements
-		ConfigurationProviderFactory {
+public class CsrfGuardHttpSessionListener implements HttpListener {
 
-	/**
-	 * Default constructor
-	 */
-	public ConfigurationOverlayProviderFactory() {
-	    // nothing needs to be done for now
-	}
+    @Override
+    public void sessionCreated(final HttpSessionEvent event) {
+        final HttpSession session = event.getSession();
+        final LogicalSession logicalSession = new ContainerSession(session);
+        CsrfGuard.getInstance().onSessionCreated(logicalSession);
+    }
 
-	/**
-	 * @see org.owasp.csrfguard.config.ConfigurationProviderFactory#retrieveConfiguration(java.util.Properties)
-	 */
-	public ConfigurationProvider retrieveConfiguration(Properties originalProperties) {
-		ConfigurationOverlayProvider configurationOverlayProvider = ConfigurationOverlayProvider.retrieveConfig();
-		Properties properties = configurationOverlayProvider.properties();
-		
-		return new PropertiesConfigurationProvider(properties);
+    @Override
+    public void sessionDestroyed(final HttpSessionEvent event) {
+        final HttpSession session = event.getSession();
+        final LogicalSession logicalSession = new ContainerSession(session);
+        CsrfGuard.getInstance().onSessionDestroyed(logicalSession);
     }
 
 }
