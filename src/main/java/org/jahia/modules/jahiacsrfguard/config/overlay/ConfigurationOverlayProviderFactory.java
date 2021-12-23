@@ -48,6 +48,7 @@ public class ConfigurationOverlayProviderFactory implements
 	public ConfigurationProvider retrieveConfiguration(Properties originalProperties) {
 		ConfigurationOverlayProvider configurationOverlayProvider = ConfigurationOverlayProvider.retrieveConfig();
 		Properties properties = configurationOverlayProvider.properties();
+		properties.putAll(configurationOverlayProvider.propertiesOverrideMap());
 		
 		return new PropertiesConfigurationProvider(properties);
     }
