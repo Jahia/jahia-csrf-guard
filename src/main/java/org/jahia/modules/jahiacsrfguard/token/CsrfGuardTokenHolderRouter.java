@@ -34,34 +34,36 @@ import org.owasp.csrfguard.token.storage.impl.InMemoryTokenHolder;
 public class CsrfGuardTokenHolderRouter {
     // Singleton
     private CsrfGuardTokenHolderRouter() {}
-    private static CsrfGuardTokenHolderRouter INSTANCE;
+    private static CsrfGuardTokenHolderRouter instance;
     private static BundleContext bundleContext;
     public static CsrfGuardTokenHolderRouter getInstance() {
-        return INSTANCE;
+        return instance;
     }
 
     private static final ServiceListener tokenHolderServiceListener = event -> {
-        if (INSTANCE == null) {
+        if (instance == null) {
             return;
         }
         ServiceReference serviceReference = event.getServiceReference();
         switch(event.getType()) {
             case ServiceEvent.MODIFIED:
             case ServiceEvent.REGISTERED:
-                INSTANCE.setTokenHolder((TokenHolder) bundleContext.getService(serviceReference));
+                instance.setTokenHolder((TokenHolder) bundleContext.getService(serviceReference));
                 break;
             case ServiceEvent.UNREGISTERING:
                 bundleContext.ungetService(serviceReference);
-                INSTANCE.setTokenHolder(new InMemoryTokenHolder());
+                instance.setTokenHolder(new InMemoryTokenHolder());
+                break;
+            default:
                 break;
         }
     };
 
     public static void init(BundleContext newBundleContext) throws InvalidSyntaxException {
         bundleContext = newBundleContext;
-        INSTANCE = new CsrfGuardTokenHolderRouter();
+        instance = new CsrfGuardTokenHolderRouter();
         // Use default implementation at initialization
-        INSTANCE.setTokenHolder(new InMemoryTokenHolder());
+        instance.setTokenHolder(new InMemoryTokenHolder());
         // Listen on TokenHolder from OSGI
         bundleContext.addServiceListener(tokenHolderServiceListener, "(objectClass=org.owasp.csrfguard.token.storage.TokenHolder)");
     }
@@ -69,7 +71,7 @@ public class CsrfGuardTokenHolderRouter {
     public static void destroy(BundleContext destroyedBundleContext) {
         // cleanup resources
         destroyedBundleContext.removeServiceListener(tokenHolderServiceListener);
-        INSTANCE = null;
+        instance = null;
         bundleContext = null;
     }
 
