@@ -25,7 +25,9 @@ package org.jahia.modules.jahiacsrfguard;
 
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.bin.listeners.JahiaContextLoaderListener;
+import org.jahia.modules.jahiacsrfguard.token.CsrfGuardTokenHolderRouter;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -54,18 +56,25 @@ public class HttpServiceListener implements BundleContextAware {
     public void setJavaScriptServlet(JavaScriptServlet javaScriptServlet) {
         this.javaScriptServlet = javaScriptServlet;
     }
-    
-    /**
-     * @param serviceReference The passed service reference, but it is a proxy class that we cannot use to retrieve the
-                               real service object, so we simply look it up again
-     */
-    public void onBind(ServiceReference serviceReference) {
+
+    public void onBind(ServiceReference serviceReference) throws InvalidSyntaxException {
+        CsrfGuardTokenHolderRouter.init(bundleContext);
+        registerServlet();
+    }
+
+    public void onUnbind(ServiceReference serviceReference) {
+        unregisterServlet(serviceReference);
+        CsrfGuardTokenHolderRouter.destroy(bundleContext);
+    }
+
+    private void registerServlet() {
+        // The passed service reference is a proxy class that we cannot use to retrieve the real service object, so we simply look it up again
         ServiceReference realServiceReference = bundleContext.getServiceReference(HttpService.class.getName());
         HttpService httpService = (HttpService) bundleContext.getService(realServiceReference);
         try {
             httpService.registerServlet("/CsrfServlet", javaScriptServlet, null, null);
             logger.info("Successfully registered custom servlet at /modules/CsrfServlet");
-            
+
             CsrfGuardServletContextListener csrfGuardServletContextListener = new CsrfGuardServletContextListener();
             csrfGuardServletContextListener.contextInitialized(new ServletContextEvent(JahiaContextLoaderListener.getServletContext()));
         } catch (ServletException | NamespaceException e) {
@@ -73,7 +82,7 @@ public class HttpServiceListener implements BundleContextAware {
         }
     }
 
-    public void onUnbind(ServiceReference serviceReference) {
+    private void unregisterServlet(ServiceReference serviceReference) {
         if (serviceReference == null) {
             return;
         }
