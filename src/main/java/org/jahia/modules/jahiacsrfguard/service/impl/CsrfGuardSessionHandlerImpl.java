@@ -21,30 +21,25 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.jahiacsrfguard;
+package org.jahia.modules.jahiacsrfguard.service.impl;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-
-import org.jahia.bin.listeners.HttpListener;
+import org.jahia.modules.jahiacsrfguard.service.CsrfGuardSessionHandler;
 import org.owasp.csrfguard.CsrfGuard;
 import org.owasp.csrfguard.session.ContainerSession;
 import org.owasp.csrfguard.session.LogicalSession;
 
-public class CsrfGuardHttpSessionListener implements HttpListener {
+import javax.servlet.http.HttpSession;
 
+public class CsrfGuardSessionHandlerImpl implements CsrfGuardSessionHandler {
     @Override
-    public void sessionCreated(final HttpSessionEvent event) {
-        final HttpSession session = event.getSession();
+    public void onSessionCreated(HttpSession session) {
         final LogicalSession logicalSession = new ContainerSession(session);
         CsrfGuard.getInstance().onSessionCreated(logicalSession);
     }
 
     @Override
-    public void sessionDestroyed(final HttpSessionEvent event) {
-        final HttpSession session = event.getSession();
+    public void onSessionDestroyed(HttpSession session) {
         final LogicalSession logicalSession = new ContainerSession(session);
         CsrfGuard.getInstance().onSessionDestroyed(logicalSession);
     }
-
 }
