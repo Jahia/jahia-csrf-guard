@@ -57,7 +57,7 @@ public class HttpServiceListener implements BundleContextAware {
         this.javaScriptServlet = javaScriptServlet;
     }
 
-    public void onBind(@SuppressWarnings("unused") ServiceReference serviceReference) throws InvalidSyntaxException {
+    public void onBind(@SuppressWarnings("java:S1172") ServiceReference serviceReference) throws InvalidSyntaxException {
         CsrfGuardTokenHolderRouter.init(bundleContext);
         registerServlet();
     }
