@@ -333,7 +333,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     }
                 } else if (startsWith(pageTokenKey, '/*')) { // full path wildcard path matching
                     value = pageToken;
-                } else if (uri.startsWith(`%CONTEXT_PATH%`) && endsWith(pageTokenKey, uri.substring("%CONTEXT_PATH%".length))) { // Jahia case as we can't add the context to the uri
+                } else if (startsWith(uri, `%CONTEXT_PATH%`) && endsWith(pageTokenKey, uri.substring("%CONTEXT_PATH%".length))) { // Jahia case as we can't add the context to the uri
                     value = pageToken;
                 } else if (endsWith(pageTokenKey, '/*') || startsWith(pageTokenKey, '.*')) { // 'partial path wildcard' and 'extension' matching
                     // TODO implement
