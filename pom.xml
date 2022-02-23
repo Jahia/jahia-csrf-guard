@@ -35,7 +35,7 @@
 
     <artifactId>jahia-csrf-guard</artifactId>
     <name>Jahia CSRF Guard</name>
-    <version>2.4.0-SNAPSHOT</version>    
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (jahia-csrf-guard) to protect Jahia from CSRF attack.</description>
 
@@ -50,7 +50,7 @@
         <jahia.plugin.version>6.0</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
-        <jahia-module-signature>MC0CFQCGxSwdnRXWwnKosf00lh6oIS3VXwIUMDlZ5ongeJldipIga6H5lRM/Fxo=</jahia-module-signature>
+        <jahia-module-signature>MCwCFFK8id+c5KkXtFbTsgB3GV4YGfFHAhQRr3jWo5whESIlDlaguAuNrbYxoA==</jahia-module-signature>
     </properties>
 
     <repositories>
