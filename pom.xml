@@ -39,6 +39,7 @@
     </scm>
 
     <properties>
+        <csrfguard.version>4.1.4-SNAPSHOT</csrfguard.version>
         <jahia.plugin.version>6.0</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
@@ -82,7 +83,7 @@
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard</artifactId>
-            <version>4.1.1</version>
+            <version>${csrfguard.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -105,12 +106,12 @@
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard-extension-session</artifactId>
-            <version>4.1.1</version>
+            <version>${csrfguard.version}</version>
         </dependency>
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard-jsp-tags</artifactId>
-            <version>4.1.1</version>
+            <version>${csrfguard.version}</version>
         </dependency>
     </dependencies>
 
