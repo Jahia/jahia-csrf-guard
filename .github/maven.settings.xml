@@ -60,22 +60,14 @@
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
         <server>
-            <id>oauth-snapshots</id>
+            <id>jahia-enterprise-snapshots</id>
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
         <server>
-            <id>oauth-releases</id>
-            <username>${env.NEXUS_USERNAME}</username>
-            <password>${env.NEXUS_PASSWORD}</password>
-        </server>
-        <server>
-            <id>staging-repository</id>
+            <id>jahia-enterprise-releases</id>
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
     </servers>
-    <pluginGroups>
-        <pluginGroup>org.owasp</pluginGroup>
-    </pluginGroups>
 </settings>
