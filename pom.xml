@@ -43,7 +43,7 @@
         <jahia.plugin.version>6.0</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
-        <jahia-module-signature>MCwCFFK8id+c5KkXtFbTsgB3GV4YGfFHAhQRr3jWo5whESIlDlaguAuNrbYxoA==</jahia-module-signature>
+        <jahia-module-signature>MC0CFE5jCK46MlmGpUvKpC99S4NbCr3aAhUAgXg3M16+fNCm0x8R515SI36TQ8w=</jahia-module-signature>
     </properties>
 
     <repositories>
@@ -112,6 +112,18 @@
             <groupId>org.owasp</groupId>
             <artifactId>csrfguard-jsp-tags</artifactId>
             <version>${csrfguard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

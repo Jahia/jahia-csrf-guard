@@ -15,11 +15,15 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.Config;
 import org.owasp.csrfguard.CsrfGuardFilter;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +34,7 @@ import java.util.Set;
 public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     private CsrfGuardFilter csrfGuardFilter;
     private Set<Config> configs = new HashSet<>();
+    private CommonsMultipartResolver multipartResolver = null;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -40,13 +45,18 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (isFiltered(request) && !isWhiteListed(request)) {
+            if (request instanceof HttpServletRequest) {
+                HttpServletRequest httpRequest = (HttpServletRequest) request;
+                request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
+                        : multipartResolver.resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
+            }
             csrfGuardFilter.doFilter(request, response, chain);
             return;
         }
 
         chain.doFilter(request, response);
     }
-
+    
     @Override
     public void destroy() {
         csrfGuardFilter.destroy();
@@ -84,5 +94,9 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
      */
     public boolean isWhiteListed(ServletRequest request) {
         return configs.stream().anyMatch(config -> config.isWhiteListed(request));
+    }
+    
+    public void setMultipartResolver(CommonsMultipartResolver multipartResolver) {
+        this.multipartResolver = multipartResolver;
     }
 }
