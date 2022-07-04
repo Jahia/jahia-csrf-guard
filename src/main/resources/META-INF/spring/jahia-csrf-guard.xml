@@ -26,8 +26,11 @@
         <property name="order" value="1.1"/> <!-- Set to be after SEO URL Rewrite filter -->
     </bean>
 
+    <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
     <bean id="csrfGuardFilterWrapper" class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardServletFilterWrapper">
         <property name="urlPatterns" value="/*"/>
+        <property name="multipartResolver" ref="multipartResolver" />
     </bean>
     
     <bean id="javaScriptServlet" class="org.owasp.csrfguard.servlet.JavaScriptServlet"/>
