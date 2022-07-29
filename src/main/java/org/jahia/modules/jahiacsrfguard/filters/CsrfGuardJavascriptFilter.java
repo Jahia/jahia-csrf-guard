@@ -98,9 +98,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             writer.write(originalContent.substring(0, indexOfCloseHeadTag));
             writer.write(codeSnippet);
             writer.write(originalContent.substring(indexOfCloseHeadTag));
-
-            int contentLength = originalContent.length() + codeSnippet.length();
-            response.setContentLength(contentLength);
         } else {
             response.getWriter().write(originalContent);
         }
