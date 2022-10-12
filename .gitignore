@@ -6,3 +6,4 @@
 *.ipr
 target
 repository.xml.generated
+.DS_Store
