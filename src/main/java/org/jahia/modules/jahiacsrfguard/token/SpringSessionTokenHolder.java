@@ -26,6 +26,7 @@ package org.jahia.modules.jahiacsrfguard.token;
 import org.apache.commons.lang3.tuple.Pair;
 import org.owasp.csrfguard.token.storage.Token;
 import org.owasp.csrfguard.token.storage.TokenHolder;
+import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 
 import java.util.Map;
@@ -44,7 +45,7 @@ public class SpringSessionTokenHolder implements TokenHolder {
     public void setMasterToken(String sessionKey, String value) {
         Token token = getToken(sessionKey);
         if (token == null) {
-            token = new SpringSessionToken(value);
+            token = new DistributedToken(value);
         } else {
             token.setMasterToken(value);
         }
@@ -55,7 +56,7 @@ public class SpringSessionTokenHolder implements TokenHolder {
     public String createMasterTokenIfAbsent(String sessionKey, Supplier<String> valueSupplier) {
         Token token = getToken(sessionKey);
         if (token == null) {
-            token = new SpringSessionToken(valueSupplier.get());
+            token = new DistributedToken(valueSupplier.get());
             saveToken(sessionKey, token);
         }
         return token.getMasterToken();
@@ -67,7 +68,7 @@ public class SpringSessionTokenHolder implements TokenHolder {
         String pageToken;
         if (Objects.isNull(token)) {
             pageToken = valueSupplier.get();
-            token = new SpringSessionToken(valueSupplier.get(), Pair.of(resourceUri, pageToken));
+            token = new DistributedToken(valueSupplier.get(), Pair.of(resourceUri, pageToken));
         } else {
             pageToken = token.setPageTokenIfAbsent(resourceUri, valueSupplier);
         }
