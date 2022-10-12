@@ -32,8 +32,10 @@
         <property name="urlPatterns" value="/*"/>
         <property name="multipartResolver" ref="multipartResolver" />
     </bean>
-    
+
     <bean id="javaScriptServlet" class="org.owasp.csrfguard.servlet.JavaScriptServlet"/>
+
+    <bean name="csrfGuardTokenHolderRouter" class="org.jahia.modules.jahiacsrfguard.token.CsrfGuardTokenHolderRouter" init-method="init" destroy-method="destroy"/>
 
     <bean id="httpServiceListener" class="org.jahia.modules.jahiacsrfguard.HttpServiceListener">
         <property name="javaScriptServlet" ref="javaScriptServlet" />
@@ -43,23 +45,13 @@
         <osgi:listener ref="httpServiceListener" bind-method="onBind" unbind-method="onUnbind" />
     </osgi:reference>
 
-    <bean id="csrfHttpSessionHandler" class="org.jahia.modules.jahiacsrfguard.service.impl.CsrfGuardSessionHandlerImpl"/>
-    <osgi:service ref="csrfHttpSessionHandler">
+    <bean id="csrfHttpSessionListener" class="org.jahia.modules.jahiacsrfguard.CsrfGuardHttpSessionListener"/>
+    <osgi:service ref="csrfHttpSessionListener">
         <osgi:interfaces>
-            <value>org.jahia.modules.jahiacsrfguard.service.CsrfGuardSessionHandler</value>
+            <value>org.jahia.bin.listeners.HttpListener</value>
+            <value>javax.servlet.http.HttpSessionListener</value>
         </osgi:interfaces>
     </osgi:service>
-
-    <bean id="csrfHttpSessionListener" class="org.jahia.modules.jahiacsrfguard.service.impl.CsrfGuardSessionListenerImpl">
-        <property name="csrfGuardSessionHandler" ref="csrfHttpSessionHandler"/>
-    </bean>
-	<osgi:service ref="csrfHttpSessionListener">
-		<osgi:interfaces>
-            <value>org.jahia.bin.listeners.HttpListener</value>
-			<value>javax.servlet.http.HttpSessionListener</value>
-			<value>org.jahia.modules.jahiacsrfguard.service.CsrfGuardSessionListener</value>
-		</osgi:interfaces>
-	</osgi:service>
 
     <compendium:managed-service-factory factory-pid="org.jahia.modules.jahiacsrfguard" interface="org.jahia.modules.jahiacsrfguard.Config" autowire-on-update="true">
         <bean class="org.jahia.modules.jahiacsrfguard.Config" init-method="init" destroy-method="destroy">

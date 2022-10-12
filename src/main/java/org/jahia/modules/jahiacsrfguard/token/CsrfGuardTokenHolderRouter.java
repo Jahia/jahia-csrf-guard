@@ -1,70 +1,85 @@
 /*
- * Copyright (C) 2002-2022 Jahia Solutions Group SA. All rights reserved.
+ * ==========================================================================================
+ * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
+ * ==========================================================================================
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *                                  http://www.jahia.com
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
+ * ==========================================================================================
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *     Copyright (C) 2002-2021 Jahia Solutions Group. All rights reserved.
+ *
+ *     This file is part of a Jahia's Enterprise Distribution.
+ *
+ *     Jahia's Enterprise Distributions must be used in accordance with the terms
+ *     contained in the Jahia Solutions Group Terms & Conditions as well as
+ *     the Jahia Sustainable Enterprise License (JSEL).
+ *
+ *     For questions regarding licensing, support, production usage...
+ *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ *
+ * ==========================================================================================
  */
 package org.jahia.modules.jahiacsrfguard.token;
 
-import org.osgi.framework.*;
+import org.eclipse.gemini.blueprint.context.BundleContextAware;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.owasp.csrfguard.token.storage.TokenHolder;
 import org.owasp.csrfguard.token.storage.impl.InMemoryTokenHolder;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
 
 /**
  * This class is a Singleton because the TokenHolder is instantiated by CSRF guard internally,
  * This router is able to detect and use a custom implementation from OSGI services or used a default implementation: InMemoryTokenHolder
  */
-public class CsrfGuardTokenHolderRouter {
-    // Singleton
-    private CsrfGuardTokenHolderRouter() {}
+public class CsrfGuardTokenHolderRouter implements BundleContextAware {
     private static CsrfGuardTokenHolderRouter instance;
-    private static BundleContext bundleContext;
+
+    private BundleContext bundleContext;
+    private ServiceTracker st;
+
+    // Singleton
+    private CsrfGuardTokenHolderRouter() {
+        instance = this;
+    }
+
     public static CsrfGuardTokenHolderRouter getInstance() {
         return instance;
     }
 
-    private static final ServiceListener tokenHolderServiceListener = event -> {
-        if (instance == null) {
-            return;
-        }
-        ServiceReference serviceReference = event.getServiceReference();
-        switch(event.getType()) {
-            case ServiceEvent.MODIFIED:
-            case ServiceEvent.REGISTERED:
-                instance.setTokenHolder((TokenHolder) bundleContext.getService(serviceReference));
-                break;
-            case ServiceEvent.UNREGISTERING:
-                bundleContext.ungetService(serviceReference);
-                instance.setTokenHolder(new InMemoryTokenHolder());
-                break;
-            default:
-                break;
-        }
-    };
-
-    public static void init(BundleContext newBundleContext) throws InvalidSyntaxException {
-        bundleContext = newBundleContext;
-        instance = new CsrfGuardTokenHolderRouter();
-        // Use default implementation at initialization
-        instance.setTokenHolder(new InMemoryTokenHolder());
-        // Listen on TokenHolder from OSGI
-        bundleContext.addServiceListener(tokenHolderServiceListener, "(objectClass=org.owasp.csrfguard.token.storage.TokenHolder)");
+    @Override
+    public void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 
-    public static void destroy(BundleContext destroyedBundleContext) {
-        // cleanup resources
-        destroyedBundleContext.removeServiceListener(tokenHolderServiceListener);
-        instance = null;
-        bundleContext = null;
+    public void init() {
+        // Use default implementation at initialization
+        setTokenHolder(new InMemoryTokenHolder());
+
+        // Listen on TokenHolder from OSGI
+        st = new ServiceTracker(bundleContext, "org.springframework.session.SessionRepository", null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                Object result = super.addingService(reference);
+                setTokenHolder(new SpringSessionTokenHolder((SessionRepository) result));
+                return result;
+            }
+
+            @Override
+            public void removedService(ServiceReference reference, Object service) {
+                setTokenHolder(new InMemoryTokenHolder());
+            }
+        };
+        st.open();
+    }
+
+    public void destroy() {
+        st.close();
     }
 
     // instance data
