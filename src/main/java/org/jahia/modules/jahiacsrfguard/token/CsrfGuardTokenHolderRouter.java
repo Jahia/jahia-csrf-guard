@@ -27,10 +27,8 @@ import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.owasp.csrfguard.token.storage.TokenHolder;
 import org.owasp.csrfguard.token.storage.impl.InMemoryTokenHolder;
-import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 
 /**
