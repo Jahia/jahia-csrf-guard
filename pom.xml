@@ -145,11 +145,6 @@
                     <instructions>
                         <Jahia-Depends>default</Jahia-Depends>
                         <_dsannotations>*</_dsannotations>
-                        <Export-Package>
-                            org.owasp.csrfguard.token.storage,
-                            org.owasp.csrfguard.token.storage.impl,
-                            org.jahia.modules.jahiacsrfguard.service
-                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
