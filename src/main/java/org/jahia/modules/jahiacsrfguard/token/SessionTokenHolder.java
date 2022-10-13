@@ -141,7 +141,7 @@ public class SessionTokenHolder implements TokenHolder {
     }
 
     private static HttpSession getSession(String sessionKey) {
-        HttpSession session = currentRequest.get().getSession();
+        HttpSession session = currentRequest.get() != null ? currentRequest.get().getSession() : null;
         if (session != null && !session.getId().equals(sessionKey)) {
             logger.error("Session id does not match");
             return null;
