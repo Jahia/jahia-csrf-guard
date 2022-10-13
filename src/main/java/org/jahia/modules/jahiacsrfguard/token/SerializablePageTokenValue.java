@@ -26,26 +26,26 @@ package org.jahia.modules.jahiacsrfguard.token;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public final class DistributedPageTokenValue implements Serializable {
+public final class SerializablePageTokenValue implements Serializable {
 
     private String pageTokenValue;
     private LocalDateTime localDateTime;
 
-    private DistributedPageTokenValue(final String pageTokenValue) {
+    private SerializablePageTokenValue(final String pageTokenValue) {
         this(pageTokenValue, LocalDateTime.now());
     }
 
-    private DistributedPageTokenValue(final String pageTokenValue, final LocalDateTime localDateTime) {
+    private SerializablePageTokenValue(final String pageTokenValue, final LocalDateTime localDateTime) {
         this.pageTokenValue = pageTokenValue;
         this.localDateTime = localDateTime;
     }
 
-    public static DistributedPageTokenValue from(final String pageTokenValue) {
-        return new DistributedPageTokenValue(pageTokenValue);
+    public static SerializablePageTokenValue from(final String pageTokenValue) {
+        return new SerializablePageTokenValue(pageTokenValue);
     }
 
-    public static DistributedPageTokenValue from(final String pageTokenValue, final LocalDateTime localDateTime) {
-        return new DistributedPageTokenValue(pageTokenValue, localDateTime);
+    public static SerializablePageTokenValue from(final String pageTokenValue, final LocalDateTime localDateTime) {
+        return new SerializablePageTokenValue(pageTokenValue, localDateTime);
     }
 
     public String getValue() {

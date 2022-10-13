@@ -1,51 +1,31 @@
-/*
- * ==========================================================================================
- * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
- * ==========================================================================================
- *
- *                                  http://www.jahia.com
- *
- * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
- * ==========================================================================================
- *
- *     Copyright (C) 2002-2021 Jahia Solutions Group. All rights reserved.
- *
- *     This file is part of a Jahia's Enterprise Distribution.
- *
- *     Jahia's Enterprise Distributions must be used in accordance with the terms
- *     contained in the Jahia Solutions Group Terms & Conditions as well as
- *     the Jahia Sustainable Enterprise License (JSEL).
- *
- *     For questions regarding licensing, support, production usage...
- *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
- *
- * ==========================================================================================
- */
 package org.jahia.modules.jahiacsrfguard.token;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.owasp.csrfguard.token.TokenUtils;
 import org.owasp.csrfguard.token.storage.Token;
 import org.owasp.csrfguard.token.storage.TokenHolder;
-import org.springframework.session.Session;
-import org.springframework.session.SessionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class SpringSessionTokenHolder implements TokenHolder {
+public class SessionTokenHolder implements TokenHolder {
+    private static final Logger logger = LoggerFactory.getLogger(SessionTokenHolder.class);
     public static final String CSRF_TOKEN = "CSRF_TOKEN";
-    private SessionRepository sessionRepository;
 
-    public SpringSessionTokenHolder(SessionRepository sessionRepository) {
-        this.sessionRepository = sessionRepository;
-    }
+    private static ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
+
+    public SessionTokenHolder() {}
 
     @Override
     public void setMasterToken(String sessionKey, String value) {
         Token token = getToken(sessionKey);
         if (token == null) {
-            token = new DistributedToken(value);
+            token = new SerializableToken(value);
         } else {
             token.setMasterToken(value);
         }
@@ -56,8 +36,7 @@ public class SpringSessionTokenHolder implements TokenHolder {
     public String createMasterTokenIfAbsent(String sessionKey, Supplier<String> valueSupplier) {
         Token token = getToken(sessionKey);
         if (token == null) {
-            token = new DistributedToken(valueSupplier.get());
-            saveToken(sessionKey, token);
+            token = createToken(sessionKey, valueSupplier);
         }
         return token.getMasterToken();
     }
@@ -68,7 +47,7 @@ public class SpringSessionTokenHolder implements TokenHolder {
         String pageToken;
         if (Objects.isNull(token)) {
             pageToken = valueSupplier.get();
-            token = new DistributedToken(valueSupplier.get(), Pair.of(resourceUri, pageToken));
+            token = new SerializableToken(valueSupplier.get(), Pair.of(resourceUri, pageToken));
         } else {
             pageToken = token.setPageTokenIfAbsent(resourceUri, valueSupplier);
         }
@@ -79,7 +58,15 @@ public class SpringSessionTokenHolder implements TokenHolder {
 
     @Override
     public Token getToken(String sessionKey) {
-        return sessionRepository.getSession(sessionKey).getAttribute(CSRF_TOKEN);
+        Token token = null;
+        HttpSession session = getSession(sessionKey);
+        if (session != null) {
+            token = (Token) session.getAttribute(CSRF_TOKEN);
+            if (token == null) {
+                token = createToken(sessionKey, TokenUtils::generateRandomToken);
+            }
+        }
+        return token;
     }
 
     @Override
@@ -109,7 +96,6 @@ public class SpringSessionTokenHolder implements TokenHolder {
 
     @Override
     public void remove(String sessionKey) {
-        sessionRepository.getSession(sessionKey).removeAttribute(CSRF_TOKEN);
     }
 
     @Override
@@ -136,7 +122,31 @@ public class SpringSessionTokenHolder implements TokenHolder {
         }
     }
 
-    private void saveToken(final String sessionKey, Token token) {
-        sessionRepository.getSession(sessionKey).setAttribute(CSRF_TOKEN, token);
+    private Token createToken(String sessionKey, Supplier<String> valueSupplier) {
+        Token token;
+        token = new SerializableToken(valueSupplier.get());
+        saveToken(sessionKey, token);
+        return token;
     }
+
+    private void saveToken(final String sessionKey, Token token) {
+        HttpSession session = getSession(sessionKey);
+        if (session != null) {
+            session.setAttribute(CSRF_TOKEN, token);
+        }
+    }
+
+    public static void setCurrentRequest(HttpServletRequest request) {
+        currentRequest.set(request);
+    }
+
+    private static HttpSession getSession(String sessionKey) {
+        HttpSession session = currentRequest.get().getSession();
+        if (session != null && !session.getId().equals(sessionKey)) {
+            logger.error("Session id does not match");
+            return null;
+        }
+        return session;
+    }
+
 }
