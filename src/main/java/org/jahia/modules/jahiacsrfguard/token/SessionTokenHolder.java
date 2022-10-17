@@ -61,7 +61,11 @@ public class SessionTokenHolder implements TokenHolder {
         Token token = null;
         HttpSession session = getSession(sessionKey);
         if (session != null) {
-            token = (Token) session.getAttribute(CSRF_TOKEN);
+            try {
+                token = (Token) session.getAttribute(CSRF_TOKEN);
+            } catch (ClassCastException e) {
+                logger.debug("Invalid class for token, reset to new one");
+            }
             if (token == null) {
                 token = createToken(sessionKey, TokenUtils::generateRandomToken);
             }
