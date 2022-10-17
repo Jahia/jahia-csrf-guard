@@ -11,6 +11,12 @@ Upgrade to a minor version should be seamless but you will have to compare the c
 #### Major version
 It will depend of the changelog and breaking changes of the version, but again here do not forget to compare the csrfguard.template.js with its original version to merge the changes.
 
+#### Minification
+
+Minify the template using the following command :
+
+```terser -m -c conditionals=true -f quote_style=1 -- src/main/resources/META-INF/csrfguard.template.uncompressed.js```
+
 ## Open-Source
 
 This is an Open-Source module, you can find more details about Open-Source @ Jahia [in this repository](https://github.com/Jahia/open-source).
