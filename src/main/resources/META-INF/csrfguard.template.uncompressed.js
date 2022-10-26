@@ -746,7 +746,6 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     });
 
                     if (isValidUrl(this.url) && isDotDoUrl(this.url)) {
-                        console.log('Setting header xxx');
                         this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
                         let normalizedUrl = normalizeUrl(this.url);
