@@ -100,6 +100,88 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             return s.substring(s.length - suffix.length) === suffix;
         }
 
+        function computePageToken(pageTokens, modifiedUri) {
+            let result = null;
+
+            let pathWithoutLeadingSlash = window.location.pathname.substring(1); // e.g. deploymentName/service/endpoint
+            let pathArray = pathWithoutLeadingSlash.split('/');
+
+            let builtPath = '';
+            for (let i = 0; i < pathArray.length - 1; i++) { // the last part of the URI (endpoint) is disregarded because the modifiedUri parameter is used instead
+                builtPath += '/' + pathArray[i];
+                let pageTokenValue = calculatePageTokenForUri(pageTokens, builtPath + modifiedUri);
+                if (pageTokenValue !== undefined) {
+                    result = pageTokenValue;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * For the library to function correctly, all the URLs must start with a forward slash (/)
+         * Parameters must be removed from the URL
+         */
+        function normalizeUrl(url) {
+            var removeParameters = function(currentUrl, symbol) {
+                let index = currentUrl.indexOf(symbol);
+                return index > 0 ? currentUrl.substring(0, index) : currentUrl;
+            }
+
+            /*
+             * TODO should other checks be done here like in the isValidUrl?
+             * Could the url parameter contain full URLs with protocol domain, port etc?
+             */
+            let normalizedUrl = startsWith(url, '/') ? url : '/' + url;
+
+            normalizedUrl = removeParameters(normalizedUrl, '?');
+            normalizedUrl = removeParameters(normalizedUrl, '#');
+
+            return normalizedUrl;
+        }
+
+        /**
+         * Hijack fetch
+         */
+        function hijackFetch() {
+            var originalFetch = window.fetch;
+            window.fetch = async (url, options) => {
+                if (isValidUrl(url) && isDotDoUrl(url)) {
+                    if (!options) {
+                        options = {};
+                    }
+
+                    if (!options.headers) {
+                        options.headers = {};
+                    }
+
+                    options.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+                    let normalizedUrl = normalizeUrl(url);
+
+                    if (pageTokenWrapper.pageTokens === null) {
+                        options.headers[tokenName] = masterTokenValue;
+                    } else {
+                        let pageToken = calculatePageTokenForUri(pageTokenWrapper.pageTokens, normalizedUrl);
+                        if (!pageToken) {
+                            let computedPageToken = computePageToken(pageTokenWrapper.pageTokens, normalizedUrl);
+
+                            if (!computedPageToken) {
+                                options.headers[tokenName] = masterTokenValue;
+                            } else {
+                                options.headers[tokenName] = computedPageToken;
+                            }
+                        } else {
+                            options.headers[tokenName] = pageToken;
+                        }
+                    }
+                }
+
+                return originalFetch(url, options);
+            }
+        }
+
         /**
          *  hook using standards based prototype
          */
@@ -218,7 +300,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             window.XMLHttpRequest = initXMLHttpRequest;
         }
 
-       function isDotDoUrl(url) {
+        function isDotDoUrl(url) {
             let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
             return endsWith(pathPart,'.do') ||  pathPart.indexOf('/*') > -1;
         }
@@ -629,6 +711,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     hijackExplorer();
                 } else {
                     hijackStandard();
+                    hijackFetch();
                 }
 
                 XMLHttpRequest.prototype.onsend = function (data) {
@@ -661,48 +744,8 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                         }
                     });
 
-                    var computePageToken = function(pageTokens, modifiedUri) {
-                        let result = null;
-
-                        let pathWithoutLeadingSlash = window.location.pathname.substring(1); // e.g. deploymentName/service/endpoint
-                        let pathArray = pathWithoutLeadingSlash.split('/');
-
-                        let builtPath = '';
-                        for (let i = 0; i < pathArray.length - 1; i++) { // the last part of the URI (endpoint) is disregarded because the modifiedUri parameter is used instead
-                            builtPath += '/' + pathArray[i];
-                            let pageTokenValue = calculatePageTokenForUri(pageTokens, builtPath + modifiedUri);
-                            if (pageTokenValue != undefined) {
-                                result = pageTokenValue;
-                                break;
-                            }
-                        }
-
-                        return result;
-                    };
-
-                    /**
-                     * For the library to function correctly, all the URLs must start with a forward slash (/)
-                     * Parameters must be removed from the URL
-                     */
-                    var normalizeUrl = function(url) {
-                        var removeParameters = function(currentUrl, symbol) {
-                            let index = currentUrl.indexOf(symbol);
-                            return index > 0 ? currentUrl.substring(0, index) : currentUrl;
-                        }
-
-                        /*
-                         * TODO should other checks be done here like in the isValidUrl?
-                         * Could the url parameter contain full URLs with protocol domain, port etc?
-                         */
-                        let normalizedUrl = startsWith(url, '/') ? url : '/' + url;
-
-                        normalizedUrl = removeParameters(normalizedUrl, '?');
-                        normalizedUrl = removeParameters(normalizedUrl, '#');
-
-                        return normalizedUrl;
-                    }
-
                     if (isValidUrl(this.url) && isDotDoUrl(this.url)) {
+                        console.log('Setting header xxx');
                         this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
                         let normalizedUrl = normalizeUrl(this.url);
@@ -711,10 +754,10 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                             this.setRequestHeader(tokenName, masterTokenValue);
                         } else {
                             let pageToken = calculatePageTokenForUri(pageTokenWrapper.pageTokens, normalizedUrl);
-                            if (pageToken == undefined) {
+                            if (!pageToken) {
                                 let computedPageToken = computePageToken(pageTokenWrapper.pageTokens, normalizedUrl);
 
-                                if (computedPageToken === null) {
+                                if (!computedPageToken) {
                                     this.setRequestHeader(tokenName, masterTokenValue);
                                 } else {
                                     this.setRequestHeader(tokenName, computedPageToken);
