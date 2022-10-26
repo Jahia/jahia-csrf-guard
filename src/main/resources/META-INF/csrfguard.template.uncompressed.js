@@ -711,8 +711,9 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     hijackExplorer();
                 } else {
                     hijackStandard();
-                    hijackFetch();
                 }
+
+                hijackFetch();
 
                 XMLHttpRequest.prototype.onsend = function (data) {
                     addEvent(this, 'readystatechange', function () {
