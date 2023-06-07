@@ -15,7 +15,7 @@ It will depend of the changelog and breaking changes of the version, but again h
 
 Minify the template using the following command :
 
-```terser -m -c conditionals=true -f quote_style=1 -- src/main/resources/META-INF/csrfguard.template.uncompressed.js```
+```terser -m -c conditionals=false -f quote_style=1 -- src/main/resources/META-INF/csrfguard.template.uncompressed.js```
 
 ## Open-Source
 
