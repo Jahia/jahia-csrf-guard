@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -28,7 +29,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Wrapper class for the HttpServletRequest, that enables reading the request data input stream more than once. 
+ * Wrapper class for the HttpServletRequest, that enables reading the request data input stream more than once.
  *
  */
 public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
@@ -66,6 +67,20 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
         public CachedServletInputStream() {
       /* create a new input stream from the cached request body */
             input = new ByteArrayInputStream(cachedBytes.toByteArray());
+        }
+
+        @Override
+        public boolean isFinished() {
+            return input.available() == 0;
+        }
+
+        @Override
+        public boolean isReady() {
+            return input.available()>0;
+        }
+
+        @Override
+        public void setReadListener(ReadListener readListener) {
         }
 
         @Override
