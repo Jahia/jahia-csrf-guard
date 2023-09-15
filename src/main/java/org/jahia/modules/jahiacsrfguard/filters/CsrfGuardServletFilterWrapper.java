@@ -19,6 +19,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.Config;
 import org.jahia.modules.jahiacsrfguard.token.SessionTokenHolder;
+import org.jahia.services.content.JCRSessionFactory;
+import org.jahia.services.usermanager.JahiaUser;
 import org.owasp.csrfguard.CsrfGuardFilter;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
@@ -46,6 +48,8 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         SessionTokenHolder.setCurrentRequest((HttpServletRequest)request);
+        setRequestUser(request);
+
         try {
             if (isFiltered(request) && !isWhiteListed(request)) {
                 if (request instanceof HttpServletRequest) {
@@ -60,6 +64,13 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
             chain.doFilter(request, response);
         } finally {
             SessionTokenHolder.setCurrentRequest(null);
+        }
+    }
+
+    private void setRequestUser(ServletRequest request) {
+        JahiaUser currentUser = JCRSessionFactory.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            request.setAttribute("REMOTE_USER", currentUser.getName());
         }
     }
 
