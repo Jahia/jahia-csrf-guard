@@ -40,7 +40,6 @@
 
     <properties>
         <csrfguard.version>4.3.0</csrfguard.version>
-        <jahia.plugin.version>6.0</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
         <jahia-module-signature>MCwCFFGnzp1Q5ZBQ8DgHzeuygN20m96BAhRIKR8Z4HHL4HYErFjwAlpL6ZGxIw==</jahia-module-signature>

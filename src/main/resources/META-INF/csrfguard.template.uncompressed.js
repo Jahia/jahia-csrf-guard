@@ -220,7 +220,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
 
        function isDotDoUrl(url) {
             let pathPart = (url.indexOf('?') !== -1) ? url.substring(0, url.indexOf('?')) : url;
-            return endsWith(pathPart,'.do') ||  pathPart.indexOf('/*') > -1;
+            return endsWith(pathPart,'.do') || endsWith(pathPart, '/*');
         }
 
         /**
