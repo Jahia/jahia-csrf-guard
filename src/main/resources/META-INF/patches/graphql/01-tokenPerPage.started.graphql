@@ -1,9 +1,0 @@
-mutation {
-    admin {
-        jahia {
-            configuration(pid:"org.owasp.csrfguard", updateOnly: true) {
-                tokenPerPage: value(name:"org.owasp.csrfguard.TokenPerPage", value:"true")
-            }
-        }
-    }
-}
