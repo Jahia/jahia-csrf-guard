@@ -241,7 +241,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             /* check exact or subdomain match */
             if (current === target) {
                 result = true;
-            } else if ('%DOMAIN_STRICT%' === false) {
+            } else if (Boolean('%DOMAIN_STRICT%') === false) {
                 if (target.charAt(0) === '.') {
                     result = endsWith(current, target);
                 } else {
