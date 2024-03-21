@@ -644,8 +644,8 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                 XMLHttpRequest.prototype.onsend = function (data) {
                     addEvent(this, 'readystatechange', function () {
                         if (this.readyState === 4) {
-                            let tokenResponseHeader = this.getResponseHeader(tokenName);
-                            if (tokenResponseHeader) {
+                            if (this.getAllResponseHeaders().indexOf(tokenName.toLowerCase()) !== -1) {
+                                let tokenResponseHeader = this.getResponseHeader(tokenName);
                                 try {
                                     let tokenTO = JSON.parse(tokenResponseHeader)
 
