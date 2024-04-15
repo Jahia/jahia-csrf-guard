@@ -36,7 +36,7 @@ jobs:
       - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
         env:
-          NEXUS_INTERNAL_URL: https://devtools.jahia.com/nexus/content/groups/internal/
+          NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }} 
         with:
           github_slug: Jahia/jahia-csrf-guard
           primary_release_branch: master
