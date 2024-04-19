@@ -27,7 +27,7 @@ jobs:
     needs: update-signature
     runs-on: ubuntu-latest
     env:
-      NEXUS_INTERNAL_URL: https://devtools.jahia.com/nexus/content/groups/internal/
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }} 
     container:
       image: jahia/cimg-mvn-cache:ga_cimg_openjdk_11.0.20-node
       credentials:
@@ -61,7 +61,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     env:
-      NEXUS_INTERNAL_URL: https://devtools.jahia.com/nexus/content/groups/internal/
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
     container:
       image: jahia/cimg-mvn-cache:ga_cimg_openjdk_11.0.20-node
       credentials:

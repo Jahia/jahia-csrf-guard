@@ -14,6 +14,8 @@ jobs:
   sonar-analysis:
     name: Sonar Analysis
     runs-on: ubuntu-latest
+    env:
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }} 
     strategy:
       fail-fast: false
       matrix:
@@ -41,3 +43,4 @@ jobs:
           sonar_url: ${{ secrets.SONAR_URL }}
           sonar_token: ${{ secrets.SONAR_TOKEN }}
           mvn_settings_filepath: '.github/maven.settings.xml'
+          nvd_apikey: ${{ secrets.NVD_APIKEY }}
