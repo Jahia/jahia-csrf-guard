@@ -563,8 +563,10 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                         let pageTokens = JSON.parse(xhr.responseText)['pageTokens'];
                         console.debug('Received page tokens: ', pageTokens);
                         callback.call(this, pageTokens);
+                    } else if (xhr.status === 0) {
+                        console.warn("CSRF page tokens response is empty (may be due to a aborted request).")
                     } else {
-                        alert(xhr.status + ': CSRF check failed');
+                        console.error("CSRF check failed, request status: {}", xhr.status);
                     }
                 }
             };
@@ -758,7 +760,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
             }
             window.csrfguarded = true;
         } else {
-            alert('OWASP CSRFGuard JavaScript was included from within an unauthorized domain!');
+            console.error('OWASP CSRFGuard JavaScript was included from within an unauthorized domain!');
         }
     })();
 }
