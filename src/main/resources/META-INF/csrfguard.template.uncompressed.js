@@ -390,12 +390,12 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     hidden.setAttribute('value', value);
 
                     form.appendChild(hidden);
-                    console.debug('Hidden input element [', hidden, '] was added to the form: ', form);
+                    // console.debug('Hidden input element [', hidden, '] was added to the form: ', form);
                 } else {
                     hiddenTokenFields.forEach(function (i) {
                         return form.elements[i].value = value;
                     });
-                    console.debug('Hidden token fields [', hiddenTokenFields, '] of form [', form, '] were updated with new token value: ', value);
+                    // console.debug('Hidden token fields [', hiddenTokenFields, '] of form [', form, '] were updated with new token value: ', value);
                 }
             }
         }
@@ -440,7 +440,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
 
                     try {
                         element.setAttribute(attr, newLocation);
-                        console.debug('Attribute [', attr, '] with value [', newLocation, '] set for element: ', element);
+                        // console.debug('Attribute [', attr, '] with value [', newLocation, '] set for element: ', element);
                     } catch (e) {
                         // attempted to set/update unsupported attribute
                     }
@@ -451,7 +451,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                     });
 
                     element.setAttribute(attr, newLocation);
-                    console.debug('Attribute [', attr, '] with value [', newLocation, '] set for element: ', element);
+                    // console.debug('Attribute [', attr, '] with value [', newLocation, '] set for element: ', element);
                 }
             }
         }
@@ -561,7 +561,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         let pageTokens = JSON.parse(xhr.responseText)['pageTokens'];
-                        console.debug('Received page tokens: ', pageTokens);
+                        // console.debug('Received page tokens: ', pageTokens);
                         callback.call(this, pageTokens);
                     } else if (xhr.status === 0) {
                         console.warn("CSRF page tokens response is empty (may be due to a aborted request).")
@@ -617,7 +617,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
         if (isValidDomain(document.domain, target)) {
             var tokenName = '%TOKEN_NAME%';
             var masterTokenValue = '%TOKEN_VALUE%';
-            console.debug('Master token [' + tokenName + ']: ', masterTokenValue);
+            // console.debug('Master token [' + tokenName + ']: ', masterTokenValue);
 
             var isLoadedWrapper = {isDomContentLoaded: false};
 
@@ -656,7 +656,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                                     let newMasterToken = tokenTO['masterToken'];
                                     if (newMasterToken !== undefined) {
                                         masterTokenValue = newMasterToken;
-                                        console.debug('New master token value received: ', masterTokenValue);
+                                        // console.debug('New master token value received: ', masterTokenValue);
                                     }
 
                                     let newPageTokens = tokenTO['pageTokens'];
@@ -664,7 +664,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
                                         Object.keys(newPageTokens).forEach(function (key) {
                                             return pageTokenWrapper.pageTokens[key] = newPageTokens[key];
                                         });
-                                        console.debug('New page token value(s) received: ', newPageTokens);
+                                        // console.debug('New page token value(s) received: ', newPageTokens);
                                     }
 
                                     injectTokens(tokenName, masterTokenValue, pageTokenWrapper.pageTokens);
