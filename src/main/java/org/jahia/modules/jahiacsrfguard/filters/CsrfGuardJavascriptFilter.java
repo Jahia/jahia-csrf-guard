@@ -54,7 +54,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        //TODO maybe base the tag on the module timestamp to ensure a new config generates new tag
         this.tag = loadTag();
     }
 

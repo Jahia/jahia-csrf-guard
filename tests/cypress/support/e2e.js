@@ -1,5 +1,4 @@
 
-
 // ***********************************************************
 // This example support/index.js is processed and
 // loaded automatically before your test files.
@@ -16,27 +15,40 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
-import 'cypress-wait-until'
-import 'cypress-iframe'
+import './commands';
+import 'cypress-wait-until';
+import 'cypress-iframe';
+import 'cypress-real-events';
 
-require('cypress-terminal-report/src/installLogsCollector')()
-require('@jahia/cypress/dist/support/registerSupport').registerSupport()
+import {registerSupport} from '@jahia/cypress/dist/support/registerSupport';
+
 Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
+    // Returning false here prevents Cypress from
     // failing the test
-    return false
-})
+    return false;
+});
 if (Cypress.browser.family === 'chromium') {
     Cypress.automation('remote:debugger:protocol', {
         command: 'Network.enable',
-        params: {},
-    })
+        params: {}
+    });
     Cypress.automation('remote:debugger:protocol', {
         command: 'Network.setCacheDisabled',
-        params: { cacheDisabled: true },
-    })
+        params: {cacheDisabled: true}
+    });
 }
+
+registerSupport();
+
+const optionsCollector = {
+    enableExtendedCollector: true,
+    xhr: {
+        printHeaderData: true,
+        printRequestData: true
+    }
+};
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('cypress-terminal-report/src/installLogsCollector')(optionsCollector);
 
 Cypress.on('test:after:run', (test, runnable) => {
     let videoName = Cypress.spec.relative;

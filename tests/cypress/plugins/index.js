@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const sshCommand = require('./ssh')
+const sshCommand = require('./ssh');
+
 module.exports = (on, config) => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@jahia/cypress/dist/plugins/registerPlugins').registerPlugins(on, config);
     // Custom tasks (Useful to run code in Node from cypress tests)
     on('task', {

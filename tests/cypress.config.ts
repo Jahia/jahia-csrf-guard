@@ -12,6 +12,8 @@ export default defineConfig({
     videosFolder: './results/videos',
     viewportWidth: 1366,
     viewportHeight: 768,
+    redirectionLimit: 60,
+    downloadsFolder: '/tmp',
     e2e: {
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing tcleahese.
@@ -22,7 +24,7 @@ export default defineConfig({
             return require('./cypress/plugins/index.js')(on, config);
         },
         excludeSpecPattern: '*.ignore.ts',
-        baseUrl: 'http://localhost:8080',
-        experimentalSessionAndOrigin: false
+        specPattern: ['**/*.cy.begin.ts', '**/*.cy.ts'],
+        baseUrl: 'http://localhost:8080'
     }
 });

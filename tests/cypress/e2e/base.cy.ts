@@ -5,7 +5,8 @@ describe('Base CSRF tests', () => {
     before('Create target test site', () => {
         cy.log('Create site ' + targetSiteKey + ' for csrf tests');
         createSite(targetSiteKey, {locale: 'en', templateSet: 'jahia-csrf-guard-test-module', serverName: 'localhost'});
-        addNode({parentPathOrId: `/sites/${targetSiteKey}/home`,
+        addNode({
+            parentPathOrId: `/sites/${targetSiteKey}/home`,
             primaryNodeType: 'jnt:contentList',
             name: 'pagecontent'
         }).then(() => {
