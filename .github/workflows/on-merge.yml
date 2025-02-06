@@ -59,8 +59,6 @@ jobs:
     name: Integration Tests (Standalone)
     needs: build
     runs-on: self-hosted
-    strategy:
-      fail-fast: false
     timeout-minutes: 45
     steps:
       - uses: jahia/jahia-modules-action/helper@v2
