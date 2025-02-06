@@ -1,4 +1,4 @@
-import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from "@jahia/cypress";
+import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
 
 describe('Base CSRF tests', () => {
     const targetSiteKey = 'csrfGuardSite';
@@ -46,5 +46,4 @@ describe('Base CSRF tests', () => {
     after('Clean', () => {
         deleteSite(targetSiteKey);
     });
-
 });
