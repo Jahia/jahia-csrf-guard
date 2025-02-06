@@ -7,7 +7,7 @@
   password: ${env:NEXUS_PASSWORD}
 
 - installBundle:
-  - 'mvn:org.jahia.test/jahia-csrf-guard-test-module'
+  - 'mvn:org.jahia.test/dummy-csrf-test-module'
   - 'mvn:org.jahia.modules/jahia-csrf-guard'
   autoStart: true
   uninstallPreviousVersion: true

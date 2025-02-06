@@ -15,10 +15,13 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.bin.filters.CompositeFilter;
+import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.render.URLResolver;
+import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,11 +49,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
     private String servletPath;
+    private String tag;
     private String[] resolvedUrlPatterns;
 
     @Override
     public void init(FilterConfig filterConfig) {
-        // do nothing
+        //TODO maybe base the tag on the module timestamp to ensure a new config generates new tag
+        this.tag = loadTag();
     }
 
     @Override
@@ -70,6 +77,11 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         if (responseWrapper.isStreamUsed() || !responseWrapper.isWriterUsed()) {
             return;
         }
+        if(JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser())) {
+            logger.debug("Not adding CSRFGuard JS to '{}': user not logged", httpRequest.getRequestURI());
+            return;
+        }
+
         String originalContent = responseWrapper.toString();
         int length = httpRequest.getContextPath().length();
         String requestPath = length > 0 ? httpRequest.getRequestURI().substring(length) : httpRequest.getRequestURI();
@@ -131,7 +143,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @SuppressWarnings("java:S3457")
     private String buildCodeSnippet(String contextPath) {
-        String src = contextPath + servletPath;
+        String src = contextPath.concat(servletPath).concat("?").concat(tag);
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -171,4 +183,15 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
+    private String loadTag() {
+        try (InputStream input = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
+            if (input != null) {
+                Properties properties = new Properties();
+                properties.load(input);
+                return DigestUtils.sha256Hex(properties.getProperty("Bundle-Version")).substring(0, 6);
+            }
+        } catch (Exception e) { //ignored
+        }
+        return "unknown";
+    }
 }
