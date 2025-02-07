@@ -17,6 +17,7 @@ package org.jahia.modules.jahiacsrfguard;
 
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.bin.listeners.JahiaContextLoaderListener;
+import org.jahia.modules.jahiacsrfguard.servlet.JavaScriptServletCached;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
@@ -36,14 +37,14 @@ public class HttpServiceListener implements BundleContextAware {
 
     public static final Logger logger = LoggerFactory.getLogger(HttpServiceListener.class);
 
-    JavaScriptServlet javaScriptServlet;
+    JavaScriptServletCached javaScriptServlet;
     BundleContext bundleContext;
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
-    public void setJavaScriptServlet(JavaScriptServlet javaScriptServlet) {
+    public void setJavaScriptServlet(JavaScriptServletCached javaScriptServlet) {
         this.javaScriptServlet = javaScriptServlet;
     }
 
