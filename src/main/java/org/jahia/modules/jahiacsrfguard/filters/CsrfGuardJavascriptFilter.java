@@ -51,6 +51,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private String servletPath;
     private String tag;
     private String[] resolvedUrlPatterns;
+    private boolean skipForUnauthentifiedUsers;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -76,17 +77,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         if (responseWrapper.isStreamUsed() || !responseWrapper.isWriterUsed()) {
             return;
         }
-        if(JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser())) {
-            logger.debug("Not adding CSRFGuard JS to '{}': user not logged", httpRequest.getRequestURI());
-            return;
-        }
 
         String originalContent = responseWrapper.toString();
         int length = httpRequest.getContextPath().length();
         String requestPath = length > 0 ? httpRequest.getRequestURI().substring(length) : httpRequest.getRequestURI();
 
-        // skip filter if not html content type of if path from the request or url resolver not match one of the provided patterns.
-        if (!matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
+        // skip filter if connected user not match configured ones if not html content type of if path from the request or url resolver not match one of the provided patterns.
+        if (!matchUser() || !matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
             logger.debug("Not adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
             // In case of files, the response is already committed and cannot be overwritten.
             try {
@@ -132,12 +129,20 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         return false;
     }
 
+    private boolean matchUser() {
+        return !skipForUnauthentifiedUsers || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
+    }
+
     public void setServletPath(String servletPath) {
         this.servletPath = servletPath;
     }
 
     public void setResolvedUrlPatterns(String[] resolvedUrlPatterns) {
         this.resolvedUrlPatterns = resolvedUrlPatterns;
+    }
+
+    public void setSkipForUnauthentifiedUsers(boolean skipForUnauthentifiedUsers) {
+        this.skipForUnauthentifiedUsers = skipForUnauthentifiedUsers;
     }
 
     @SuppressWarnings("java:S3457")

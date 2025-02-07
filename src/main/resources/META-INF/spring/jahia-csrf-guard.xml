@@ -9,6 +9,7 @@
 
     <bean class="org.jahia.modules.jahiacsrfguard.filters.CsrfGuardJavascriptFilter">
         <property name="servletPath" value="/modules/CsrfServlet"/>
+        <property name="skipForUnauthentifiedUsers" value="true"/>
         <property name="resolvedUrlPatterns">
             <list>
                 <value>*.jsp</value>

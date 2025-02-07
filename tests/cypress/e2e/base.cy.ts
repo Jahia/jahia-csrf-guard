@@ -35,7 +35,7 @@ describe('Base CSRF tests', () => {
         cy.logout();
         cy.log('The page should NOT contains CSRF Tokens when not logged');
         cy.visit('/en/sites/' + targetSiteKey + '/home.html');
-        // Cy.get('head script[src="/modules/CsrfServlet"]').should('not.exist');
+        cy.get('head script[src="/modules/CsrfServlet"]').should('not.exist');
         cy.get('a#csrfLink')
             .should(link => {
                 const href = link.attr('href');

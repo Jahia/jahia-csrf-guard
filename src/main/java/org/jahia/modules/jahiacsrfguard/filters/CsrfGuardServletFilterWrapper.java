@@ -101,7 +101,6 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
      * @return true if CsrfGuardFilter should be applied
      */
     public boolean isFiltered(ServletRequest request) {
-        //TODO Tee check on auth could be done here
         return configs.stream().anyMatch(config -> config.isFiltered(request));
     }
 
