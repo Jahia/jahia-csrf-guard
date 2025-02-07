@@ -50,13 +50,3 @@ const optionsCollector = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('cypress-terminal-report/src/installLogsCollector')(optionsCollector);
 
-Cypress.on('test:after:run', (test, runnable) => {
-    let videoName = Cypress.spec.relative;
-    videoName = videoName.replace('/.cy.*', '').replace('cypress/e2e/', '');
-    const videoUrl = 'videos/' + videoName + '.mp4';
-    addContext({test}, videoUrl);
-    if (test.state === 'failed') {
-        const screenshot = `screenshots/${Cypress.spec.relative.replace('cypress/e2e/', '')}/${runnable.parent.title} -- ${test.title} (failed).png`;
-        addContext({test}, screenshot);
-    }
-});
