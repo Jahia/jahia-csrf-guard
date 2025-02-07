@@ -49,13 +49,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
     private String servletPath;
-    private String tag;
+    private String version;
     private String[] resolvedUrlPatterns;
     private boolean skipForUnauthentifiedUsers;
 
     @Override
     public void init(FilterConfig filterConfig) {
-        this.tag = loadTag();
+        this.version = loadVersion();
     }
 
     @Override
@@ -100,7 +100,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             logger.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
 
             int indexOfCloseHeadTag = closeHeadTagMatcher.start();
-            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath());
+            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath(), ((HttpServletRequest) request).getSession().getId());
 
             PrintWriter writer = response.getWriter();
             writer.write(originalContent.substring(0, indexOfCloseHeadTag));
@@ -146,8 +146,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     @SuppressWarnings("java:S3457")
-    private String buildCodeSnippet(String contextPath) {
-        String src = contextPath.concat(servletPath).concat("?").concat(tag);
+    private String buildCodeSnippet(String contextPath, String session) {
+        String src = contextPath.concat(servletPath).concat("?").concat(getTag(session));
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -187,7 +187,11 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
-    private String loadTag() {
+    private String getTag(String session) {
+        return DigestUtils.md5Hex(session.concat(version));
+    }
+
+    private String loadVersion() {
         try (InputStream input = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
             if (input != null) {
                 Properties properties = new Properties();
