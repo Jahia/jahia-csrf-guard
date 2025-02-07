@@ -40,9 +40,9 @@
     };
 </script>
 
-<a href="${dummyActionURL}" class="btn btn-primary">Call To Dummy Action (GET)</a>
+<a href="${dummyActionURL}" class="btn btn-primary" id="csrfLink">Call To Dummy Action (GET)</a>
 
-<form method="POST" action="${modifyTextActionURL}">
+<form method="POST" action="${modifyTextActionURL}" id="csrfForm">
     <input type="hidden" name="jcrNodeType" value="jnt:testContent">
     <input type="hidden" name="jcrRedirectTo" value="<c:url value='${url.base}${renderContext.mainResource.node.path}'/>">
     <input type="hidden" name="jcrResourceID" value="${currentNode.identifier}">

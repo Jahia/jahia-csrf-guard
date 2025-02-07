@@ -80,16 +80,16 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     }
 
     /**
-     * Regsiter/add configuration to filter
-     * @param config configurationn object
+     * Register/add configuration to filter
+     * @param config configuration object
      */
     public void registerConfig(Config config) {
         configs.add(config);
     }
 
     /**
-     * Remove conifguration from filter
-     * @param config configurationn object
+     * Remove configuration from filter
+     * @param config configuration object
      */
     public void unregisterConfig(Config config) {
         configs.remove(config);
@@ -101,6 +101,7 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
      * @return true if CsrfGuardFilter should be applied
      */
     public boolean isFiltered(ServletRequest request) {
+        //TODO Tee check on auth could be done here
         return configs.stream().anyMatch(config -> config.isFiltered(request));
     }
 

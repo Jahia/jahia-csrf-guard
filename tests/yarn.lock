@@ -1041,10 +1041,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@jahia/cypress@^3.35.0":
-  version "3.35.0"
-  resolved "https://registry.yarnpkg.com/@jahia/cypress/-/cypress-3.35.0.tgz#5affe03d11c69b56eeab348ef74c0e8494f8dca8"
-  integrity sha512-KpNUs8izP1k4eZ5+9HyCok2fNO/NLBfqOP4gGONlX8+x8fwkwqp+CYMllruC2tqsnDZntpEZ6RT3Irt8kYJZjw==
+"@jahia/cypress@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@jahia/cypress/-/cypress-4.1.0.tgz#84e903d0e3693b8fe9bb7c5206fff6f706582b8a"
+  integrity sha512-Fqj375T41lsrTQdETawrQb7kxUka+5QI+vC8DLD/1gxt/7RzEcFFcGn7ZL8JFdznMJdwcc77G7CsPQzvdfhUJQ==
   dependencies:
     "@apollo/client" "^3.4.9"
     cypress-real-events "^1.11.0"
@@ -2525,6 +2525,13 @@ cpu-features@~0.0.10:
   dependencies:
     buildcheck "~0.0.6"
     nan "^2.19.0"
+
+cross-fetch@3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.6.tgz#bae05aa31a4da760969756318feeee6e70f15d6c"
+  integrity sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==
+  dependencies:
+    node-fetch "^2.6.11"
 
 cross-fetch@^3.0.6:
   version "3.2.0"
@@ -5029,7 +5036,7 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-node-fetch@^2.6.1, node-fetch@^2.6.7, node-fetch@^2.7.0:
+node-fetch@^2.6.1, node-fetch@^2.6.11, node-fetch@^2.6.7, node-fetch@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
