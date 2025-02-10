@@ -19,9 +19,14 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.bin.filters.CompositeFilter;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUserManagerService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,17 +47,36 @@ import java.util.regex.Pattern;
  * A servlet filter that adds CSRF guard Javascript to HTML pages.
  *
  * @author cmoitrier
+ * @author Jerome Blanchard
  */
+@Component(immediate = true, service = AbstractServletFilter.class)
 public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(CsrfGuardJavascriptFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsrfGuardJavascriptFilter.class);
 
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
-    private String servletPath;
     private String version;
-    private String[] resolvedUrlPatterns;
-    private boolean skipForUnauthentifiedUsers;
+    @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
+    private volatile JahiaCsrfGuardGlobalConfig config;
+
+    @Activate
+    public void activate() {
+        LOGGER.info("Started Jahia CSRF Guard Javascript Filter");
+        setFilterName("Jahia CSRF Guard Javascript Filter");
+        setMatchAllUrls(true);
+        setUrlPatterns(new String[]{"/*"});
+        setDispatcherTypes(Set.of(DispatcherType.REQUEST.name(), DispatcherType.FORWARD.name()));
+        setOrder(1.1f);
+    }
+
+    private void setConfig(JahiaCsrfGuardGlobalConfig config) {
+        this.config = config;
+    }
+
+    private void unsetConfig(JahiaCsrfGuardGlobalConfig config) {
+        this.config = null;
+    }
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -60,12 +85,14 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @Override
     public void destroy() {
-        // do nothing
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (config == null || !config.isEnabled()) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
         final HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -84,20 +111,20 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
         // skip filter if connected user not match configured ones if not html content type of if path from the request or url resolver not match one of the provided patterns.
         if (!matchUser() || !matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
-            logger.debug("Not adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
+            LOGGER.debug("Not adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
             // In case of files, the response is already committed and cannot be overwritten.
             try {
                 response.getWriter().write(originalContent);
             } catch (Exception e) {
-                logger.warn("Response from {} has content that could not be written, set this class in debug for more details", httpRequest.getRequestURI());
-                logger.debug("Response content is {}", originalContent, e);
+                LOGGER.warn("Response from {} has content that could not be written, set this class in debug for more details", httpRequest.getRequestURI());
+                LOGGER.debug("Response content is {}", originalContent, e);
             }
             return;
         }
 
         Matcher closeHeadTagMatcher = CLOSE_HEAD_TAG_PATTERN.matcher(originalContent);
         if (closeHeadTagMatcher.find()) {
-            logger.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
+            LOGGER.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
 
             int indexOfCloseHeadTag = closeHeadTagMatcher.start();
             String codeSnippet = buildCodeSnippet(httpRequest.getContextPath(), ((HttpServletRequest) request).getSession().getId());
@@ -121,7 +148,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     private boolean matchPattern(String requestPath) {
-        for (String testPath : resolvedUrlPatterns) {
+        for (String testPath : config.getResolvedUrlPatterns()) {
             if (CompositeFilter.matchFiltersURL(testPath, requestPath)) {
                 return true;
             }
@@ -130,24 +157,12 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     private boolean matchUser() {
-        return !skipForUnauthentifiedUsers || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
-    }
-
-    public void setServletPath(String servletPath) {
-        this.servletPath = servletPath;
-    }
-
-    public void setResolvedUrlPatterns(String[] resolvedUrlPatterns) {
-        this.resolvedUrlPatterns = resolvedUrlPatterns;
-    }
-
-    public void setSkipForUnauthentifiedUsers(boolean skipForUnauthentifiedUsers) {
-        this.skipForUnauthentifiedUsers = skipForUnauthentifiedUsers;
+        return !config.bypassForGuest() || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
     }
 
     @SuppressWarnings("java:S3457")
     private String buildCodeSnippet(String contextPath, String session) {
-        String src = contextPath.concat(servletPath).concat("?").concat(getTag(session));
+        String src = contextPath.concat(config.getServletPath()).concat("?").concat(getTag(session));
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 

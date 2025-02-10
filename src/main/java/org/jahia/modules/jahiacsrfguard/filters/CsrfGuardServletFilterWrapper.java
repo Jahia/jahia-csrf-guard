@@ -17,27 +17,45 @@ package org.jahia.modules.jahiacsrfguard.filters;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jahia.bin.filters.AbstractServletFilter;
-import org.jahia.modules.jahiacsrfguard.Config;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfig;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfigFactory;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
 import org.jahia.modules.jahiacsrfguard.token.SessionTokenHolder;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.usermanager.JahiaUser;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.owasp.csrfguard.CsrfGuardFilter;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Wrapper for servlet filter: CsrfGuardFilter
  */
+@Component(immediate = true, service = AbstractServletFilter.class)
 public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsrfGuardServletFilterWrapper.class);
+
+    private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
+    private volatile JahiaCsrfGuardGlobalConfig globalConfig;
     private CsrfGuardFilter csrfGuardFilter;
-    private Set<Config> configs = new HashSet<>();
-    private CommonsMultipartResolver multipartResolver = null;
+
+    @Activate
+    public void activate() {
+        LOGGER.info("Started Jahia CSRF Guard Servlet Filter Wrapper");
+        setFilterName("Jahia CSRF Guard Servlet Filter Wrapper");
+        setMatchAllUrls(true);
+        setUrlPatterns(new String[]{"/*"});
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -51,11 +69,11 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         setRequestUser(request);
 
         try {
-            if (isFiltered(request) && !isWhiteListed(request)) {
+            if (isGlobalConfigEnabled() && isFiltered(request) && !isWhiteListed(request)) {
                 if (request instanceof HttpServletRequest) {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
-                            : multipartResolver.resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
+                            : globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
                 }
                 csrfGuardFilter.doFilter(request, response, chain);
                 return;
@@ -79,20 +97,36 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         csrfGuardFilter.destroy();
     }
 
-    /**
-     * Register/add configuration to filter
-     * @param config configuration object
-     */
-    public void registerConfig(Config config) {
-        configs.add(config);
+    public JahiaCsrfGuardGlobalConfig getGlobalConfig() {
+        return globalConfig;
     }
 
-    /**
-     * Remove configuration from filter
-     * @param config configuration object
-     */
-    public void unregisterConfig(Config config) {
-        configs.remove(config);
+    @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
+    public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
+        LOGGER.info("Setting configurations from factory");
+        this.configs = configFactory.getConfigs();
+    }
+
+    public void clearConfigs(JahiaCsrfGuardConfigFactory configFactory) {
+        LOGGER.info("Clearing configurations from factory");
+        this.configs = new HashSet<>();
+    }
+
+    @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setGlobalConfig", unbind = "unsetGlobalConfig")
+    public void setGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
+        this.globalConfig = globalConfig;
+    }
+
+    public void unsetGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
+        this.globalConfig = null;
+    }
+
+    public boolean isGlobalConfigEnabled() {
+        if (globalConfig == null) {
+            LOGGER.warn("Global configuration is not set, unable to apply CSRF Guard filter");
+            return false;
+        }
+        return globalConfig.isEnabled();
     }
 
     /**
@@ -113,7 +147,4 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         return configs.stream().anyMatch(config -> config.isWhiteListed(request));
     }
 
-    public void setMultipartResolver(CommonsMultipartResolver multipartResolver) {
-        this.multipartResolver = multipartResolver;
-    }
 }

@@ -15,50 +15,57 @@
  */
 package org.jahia.modules.jahiacsrfguard;
 
-import org.jahia.modules.jahiacsrfguard.filters.CsrfGuardServletFilterWrapper;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.  
+ * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.
  *
  */
-public class Config {
+public class JahiaCsrfGuardConfig {
 
-    private CsrfGuardServletFilterWrapper filter;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JahiaCsrfGuardConfig.class);
 
+    public static final String URL_PATTERNS = "urlPatterns";
+    public static final String WHITELIST = "whitelist";
+
+    private String pid;
     private List<Pattern> urlPatterns;
     private List<Pattern> whitelist;
 
-    public void setFilter(CsrfGuardServletFilterWrapper filter) {
-        this.filter = filter;
+    public JahiaCsrfGuardConfig() {
     }
 
-    /**
-     * Initialize configuration
-     */
-    public void init() {
-        filter.registerConfig(this);
-    }
-
-    /**
-     * Destroy configuration
-     */
-    public void destroy() {
-        filter.unregisterConfig(this);
+    public static JahiaCsrfGuardConfig build(String pid, Dictionary<String, ?> properties){
+        LOGGER.info("Building Jahia CSRF Guard configuration for pid: {}, config size: {}", pid, properties.size());
+        JahiaCsrfGuardConfig config = new JahiaCsrfGuardConfig();
+        config.pid = pid;
+        String urlPatterns = (String) properties.get(URL_PATTERNS);
+        if (StringUtils.isNotEmpty(urlPatterns)) {
+            config.setUrlPatterns(urlPatterns);
+        }
+        String whitelist = (String) properties.get(WHITELIST);
+        if (StringUtils.isNotEmpty(whitelist)) {
+            config.setWhitelist(whitelist);
+        }
+        return config;
     }
 
     public void setUrlPatterns(String urlPatterns) {
-        this.urlPatterns = Arrays.stream(urlPatterns.split(",")).map(String::trim).map(Config::createUrlPattern).collect(Collectors.toList());
+        this.urlPatterns = Arrays.stream(urlPatterns.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
     }
 
     public void setWhitelist(String whitelist) {
-        this.whitelist = Arrays.stream(whitelist.split(",")).map(String::trim).map(Config::createUrlPattern).collect(Collectors.toList());
+        this.whitelist = Arrays.stream(whitelist.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
     }
 
     /**
@@ -94,7 +101,7 @@ public class Config {
     /**
      * Check whitelist configuration to see whether CsrfGuardFilter should not be applied on current request
      * @param request client request object for servlet
-     * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied 
+     * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied
      */
     public boolean isWhiteListed(ServletRequest request) {
         if (whitelist == null) {
@@ -104,4 +111,8 @@ public class Config {
         return whitelist.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
     }
 
+    @Override
+    public String toString() {
+        return "JahiaCsrfGuardConfig{" + "pid='" + pid + '\'' + '}';
+    }
 }
