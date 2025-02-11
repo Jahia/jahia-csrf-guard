@@ -31,10 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Global OSGI config for Jahia CSRF Guard.
@@ -129,6 +126,21 @@ public class JahiaCsrfGuardGlobalConfig {
 
     public void setMultipartResolver(MultipartResolver multipartResolver) {
         this.multipartResolver = multipartResolver;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
+        return enabled == that.enabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
+                && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
+                && Objects.equals(multipartResolver, that.multipartResolver);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(enabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver);
     }
 
     @Override public String toString() {

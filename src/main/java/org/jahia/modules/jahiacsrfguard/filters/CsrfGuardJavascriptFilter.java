@@ -23,6 +23,7 @@ import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUserManagerService;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -56,18 +57,19 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
-    private String version;
+    private String bundleTag;
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
     private volatile JahiaCsrfGuardGlobalConfig config;
 
     @Activate
-    public void activate() {
+    public void activate(BundleContext context) {
         LOGGER.info("Started Jahia CSRF Guard Javascript Filter");
         setFilterName("Jahia CSRF Guard Javascript Filter");
         setMatchAllUrls(true);
         setUrlPatterns(new String[]{"/*"});
         setDispatcherTypes(Set.of(DispatcherType.REQUEST.name(), DispatcherType.FORWARD.name()));
         setOrder(1.1f);
+        this.bundleTag = context.getBundle().getVersion().toString().concat("-").concat(String.valueOf(context.getBundle().getBundleId()));
     }
 
     private void setConfig(JahiaCsrfGuardGlobalConfig config) {
@@ -80,7 +82,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        this.version = loadVersion();
     }
 
     @Override
@@ -161,8 +162,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     @SuppressWarnings("java:S3457")
-    private String buildCodeSnippet(String contextPath, String session) {
-        String src = contextPath.concat(config.getServletPath()).concat("?").concat(getTag(session));
+    private String buildCodeSnippet(String contextPath, String sessionId) {
+        String src = contextPath.concat(config.getServletPath()).concat("?").concat(getTag(sessionId));
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -202,19 +203,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
-    private String getTag(String session) {
-        return DigestUtils.md5Hex(session.concat(version));
+    private String getTag(String sessionId) {
+        return DigestUtils.md5Hex(sessionId.concat(bundleTag));
     }
 
-    private String loadVersion() {
-        try (InputStream input = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
-            if (input != null) {
-                Properties properties = new Properties();
-                properties.load(input);
-                return DigestUtils.sha256Hex(properties.getProperty("Bundle-Version")).substring(0, 6);
-            }
-        } catch (Exception e) { //ignored
-        }
-        return "unknown";
-    }
 }
