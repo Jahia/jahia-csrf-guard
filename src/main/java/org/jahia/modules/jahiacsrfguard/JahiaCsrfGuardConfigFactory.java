@@ -28,7 +28,6 @@ import java.util.Map;
 
 /**
  * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.
- *
  */
 @Component(service = { JahiaCsrfGuardConfigFactory.class, ManagedServiceFactory.class}, immediate = true, property = "service.pid=org.jahia.modules.jahiacsrfguard")
 public class JahiaCsrfGuardConfigFactory implements ManagedServiceFactory {
@@ -38,7 +37,7 @@ public class JahiaCsrfGuardConfigFactory implements ManagedServiceFactory {
     private final Map<String, JahiaCsrfGuardConfig> configs = new HashMap<>();
 
     public JahiaCsrfGuardConfigFactory() {
-        LOGGER.info("Creating Jahia CSRF Guard Config Factory");
+        LOGGER.debug("Creating Jahia CSRF Guard Config Factory");
     }
 
     @Override

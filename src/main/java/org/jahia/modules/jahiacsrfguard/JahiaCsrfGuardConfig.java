@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 /**
  * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.
- *
  */
 public class JahiaCsrfGuardConfig {
 
@@ -46,7 +45,7 @@ public class JahiaCsrfGuardConfig {
     }
 
     public static JahiaCsrfGuardConfig build(String pid, Dictionary<String, ?> properties){
-        LOGGER.info("Building Jahia CSRF Guard configuration for pid: {}, config size: {}", pid, properties.size());
+        LOGGER.debug("Building Jahia CSRF Guard configuration for pid: {}, config size: {}", pid, properties.size());
         JahiaCsrfGuardConfig config = new JahiaCsrfGuardConfig();
         config.pid = pid;
         String urlPatterns = (String) properties.get(URL_PATTERNS);

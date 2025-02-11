@@ -29,9 +29,7 @@ import org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeCommonUtils;
  * Use configuration overlays that use the base properties as a default, and then decorate with an overlay file
  */
 public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
-	/**
-	 * 
-	 */
+
 	public static final String META_INF_CSRFGUARD_PROPERTIES = "META-INF/csrfguard.properties";
 
 	/**
@@ -40,7 +38,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 	public static final String OWASP_CSRF_GUARD_PROPERTIES = "Owasp.CsrfGuard.properties";
 
 	/**
-	 * ovrlay properties file
+	 * overlay properties file
 	 */
 	public static final String OWASP_CSRF_GUARD_OVERLAY_PROPERTIES = "Owasp.CsrfGuard.overlay.properties";
 
@@ -52,11 +50,7 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 		return retrieveConfig(ConfigurationOverlayProvider.class);
 	}
 
-	/**
-	 * Default constructor
-	 */
 	public ConfigurationOverlayProvider() {
-	 // nothing needs to be done for now
 	}
 
 	/**
@@ -83,11 +77,8 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 		return "org.owasp.csrfguard.configOverlay.hierarchy" + (System.getProperty("java.vm.vendor").toLowerCase().contains("ibm") ? ".ibm" : "");
 	}
 
-	/**
-	 * see which configs are available
-	 */
 	private static String mainExampleConfigClasspath = null;
-	
+
 	/**
 	 * @see org.owasp.csrfguard.config.overlay.ConfigPropertiesCascadeBase#getMainExampleConfigClasspath()
 	 */
@@ -112,13 +103,13 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
 				    setMainExampleConfigClassPath(OWASP_CSRF_GUARD_PROPERTIES);
 				}
 			}
-			
+
 		}
-		
+
 		//generally this is Owasp.CsrfGuard.properties
 		return StringUtils.defaultIfBlank(CsrfGuardServletContextListener.getConfigFileName(), mainExampleConfigClasspath);
 	}
-	
+
 	private static void setMainExampleConfigClassPath(String configClassPath) {
 	    mainExampleConfigClasspath = configClassPath;
 	}
@@ -143,6 +134,6 @@ public class ConfigurationOverlayProvider extends ConfigPropertiesCascadeBase {
         }
         return super.filesNeedReloadingBasedOnContents();
     }
-    
-    
+
+
 }

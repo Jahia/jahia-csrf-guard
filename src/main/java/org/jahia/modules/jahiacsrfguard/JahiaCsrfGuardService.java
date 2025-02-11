@@ -50,7 +50,7 @@ public class JahiaCsrfGuardService {
     private JahiaCsrfGuardGlobalConfig config;
 
     public JahiaCsrfGuardService() {
-        LOGGER.info("Building Jahia CSRF Guard service...");
+        LOGGER.debug("Building Jahia CSRF Guard service...");
     }
 
     @Activate
@@ -79,6 +79,7 @@ public class JahiaCsrfGuardService {
     }
 
     private void handleConfigChange() throws ServletException, NamespaceException {
+        LOGGER.debug("Handle Jahia CSRF Guard service config change");
         if (registered) {
             httpService.unregister(registeredAlias);
             registered = false;

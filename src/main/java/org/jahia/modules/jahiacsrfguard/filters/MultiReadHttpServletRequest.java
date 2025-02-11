@@ -30,7 +30,6 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Wrapper class for the HttpServletRequest, that enables reading the request data input stream more than once.
- *
  */
 public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
     private ByteArrayOutputStream cachedBytes;
@@ -53,19 +52,17 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     private void cacheInputStream() throws IOException {
-    /* Cache the inputstream in order to read it multiple times. For
-     * convenience, I use apache.commons IOUtils
-     */
+        // Cache the InputStream in order to read it multiple times. For convenience, I use apache.commons IOUtils
         cachedBytes = new ByteArrayOutputStream();
         IOUtils.copy(super.getInputStream(), cachedBytes);
     }
 
-    /* An inputstream which reads the cached request body */
+    // An inputstream which reads the cached request body
     public class CachedServletInputStream extends ServletInputStream {
         private ByteArrayInputStream input;
 
         public CachedServletInputStream() {
-      /* create a new input stream from the cached request body */
+            // create a new input stream from the cached request body
             input = new ByteArrayInputStream(cachedBytes.toByteArray());
         }
 

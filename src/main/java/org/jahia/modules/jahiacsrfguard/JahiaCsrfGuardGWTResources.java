@@ -36,19 +36,14 @@ import java.util.List;
 @Component(service = ModuleGWTResources.class, immediate = true)
 public class JahiaCsrfGuardGWTResources extends ModuleGWTResources {
 
-    private JahiaCsrfGuardGlobalConfig config;
-
-    public JahiaCsrfGuardGWTResources() {
-    }
-
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
     private void setConfig(JahiaCsrfGuardGlobalConfig config) {
-        this.config = config;
-        super.setJavascriptResources(List.of(config.getServletPath()));
+        if (config != null) {
+            super.setJavascriptResources(List.of(config.getServletPath()));
+        }
     }
 
     private void unsetConfig(JahiaCsrfGuardGlobalConfig config) {
-        this.config = null;
     }
 
 }

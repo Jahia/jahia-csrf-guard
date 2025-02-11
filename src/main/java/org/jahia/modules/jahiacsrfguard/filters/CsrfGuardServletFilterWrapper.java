@@ -51,7 +51,7 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
 
     @Activate
     public void activate() {
-        LOGGER.info("Started Jahia CSRF Guard Servlet Filter Wrapper");
+        LOGGER.debug("Activating Jahia CSRF Guard Servlet Filter Wrapper");
         setFilterName("Jahia CSRF Guard Servlet Filter Wrapper");
         setMatchAllUrls(true);
         setUrlPatterns(new String[]{"/*"});
@@ -103,12 +103,12 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
 
     @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
     public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
-        LOGGER.info("Setting configurations from factory");
+        LOGGER.debug("Setting configurations from factory");
         this.configs = configFactory.getConfigs();
     }
 
     public void clearConfigs(JahiaCsrfGuardConfigFactory configFactory) {
-        LOGGER.info("Clearing configurations from factory");
+        LOGGER.debug("Clearing configurations from factory");
         this.configs = new HashSet<>();
     }
 

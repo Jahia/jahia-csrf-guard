@@ -21,17 +21,9 @@ import org.owasp.csrfguard.config.ConfigurationProvider;
 import org.owasp.csrfguard.config.ConfigurationProviderFactory;
 import org.owasp.csrfguard.config.PropertiesConfigurationProvider;
 
-/**
- *
- */
-public class ConfigurationOverlayProviderFactory implements
-		ConfigurationProviderFactory {
+public class ConfigurationOverlayProviderFactory implements ConfigurationProviderFactory {
 
-	/**
-	 * Default constructor
-	 */
 	public ConfigurationOverlayProviderFactory() {
-	    // nothing needs to be done for now
 	}
 
 	/**
@@ -41,7 +33,7 @@ public class ConfigurationOverlayProviderFactory implements
 		ConfigurationOverlayProvider configurationOverlayProvider = ConfigurationOverlayProvider.retrieveConfig();
 		Properties properties = configurationOverlayProvider.properties();
 		properties.putAll(configurationOverlayProvider.propertiesOverrideMap());
-		
+
 		return new PropertiesConfigurationProvider(properties);
     }
 

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Global OSGI config for Jahia CSRF Guard.
  * @author Jerome Blanchard
  */
 @Component(immediate = true, service = JahiaCsrfGuardGlobalConfig.class, configurationPid = {"org.jahia.modules.jahiacsrfguard.global"})
@@ -59,7 +60,7 @@ public class JahiaCsrfGuardGlobalConfig {
     @Activate
     @Modified
     public void modified(Map<String, String> config) {
-        LOGGER.info("Updating Jahia CSRF Guard Global configuration, config size: {}", config.size());
+        LOGGER.debug("Updating Jahia CSRF Guard Global configuration, config size: {}", config.size());
         this.setConfig(config);
         this.setEnabled(config.getOrDefault(ENABLED, "true").equalsIgnoreCase("true"));
         this.setServletPath(config.getOrDefault(SERVLET_PATH, "/modules/CsrfServlet"));
