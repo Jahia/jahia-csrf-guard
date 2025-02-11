@@ -23,14 +23,17 @@
  */
 package org.jahia.modules.jahiacsrfguard;
 
+import org.jahia.bin.listeners.JahiaContextLoaderListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
+import org.owasp.csrfguard.CsrfGuardServletContextListener;
 import org.owasp.csrfguard.servlet.JavaScriptServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
 /**
@@ -81,15 +84,19 @@ public class JahiaCsrfGuardService {
     private void handleConfigChange() throws ServletException, NamespaceException {
         LOGGER.debug("Handle Jahia CSRF Guard service config change");
         if (registered) {
+            LOGGER.info("Unregistering Jahia CSRF Guard JavaScriptServlet...");
             httpService.unregister(registeredAlias);
             registered = false;
             registeredAlias = "";
         }
         if (config.isEnabled()) {
-            LOGGER.info("Enabling Jahia CSRF Guard service...");
-            httpService.registerServlet(config.getServletPath(), new JavaScriptServlet(), null, null);
+            LOGGER.info("Registering Jahia CSRF Guard JavaScriptServlet...");
+            httpService.registerServlet(config.getServletAlias(), new JavaScriptServlet(), null, null);
             registered = true;
-            registeredAlias = config.getServletPath();
+            registeredAlias = config.getServletAlias();
+            CsrfGuardServletContextListener csrfGuardServletContextListener = new CsrfGuardServletContextListener();
+            csrfGuardServletContextListener.contextInitialized(new ServletContextEvent(JahiaContextLoaderListener.getServletContext()));
+            LOGGER.info("Jahia CSRF Guard JavaScriptServlet registered at path: {}", config.getServletPath());
         } else {
             LOGGER.info("Jahia CSRF Guard service is disabled");
         }

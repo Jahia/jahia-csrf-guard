@@ -46,12 +46,13 @@ public class JahiaCsrfGuardGlobalConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(JahiaCsrfGuardGlobalConfig.class.getName());
 
     public static final String ENABLED = "jahia.csrf-guard.enabled";
-    public static final String SERVLET_PATH = "jahia.csrf-guard.servletPath";
+    public static final String SERVLET_ALIAS = "jahia.csrf-guard.servletAlias";
     public static final String BYPASS_FOR_GUEST = "jahia.csrf-guard.bypassForGuest";
     public static final String RESOLVED_URL_PATTERNS = "jahia.csrf-guard.resolvedUrlPatterns";
 
     private Map<String, String> config = new HashMap<>();
     private boolean enabled = true;
+    private String servletAlias = "";
     private String servletPath = "";
     private boolean bypassForGuest = true;
     private List<String> resolvedUrlPatterns = new ArrayList<>();
@@ -63,7 +64,8 @@ public class JahiaCsrfGuardGlobalConfig {
         LOGGER.debug("Updating Jahia CSRF Guard Global configuration, config size: {}", config.size());
         this.setConfig(config);
         this.setEnabled(config.getOrDefault(ENABLED, "true").equalsIgnoreCase("true"));
-        this.setServletPath(config.getOrDefault(SERVLET_PATH, "/modules/CsrfServlet"));
+        this.setServletAlias(config.getOrDefault(SERVLET_ALIAS, "/CsrfServlet"));
+        this.setServletPath("/modules".concat(this.getServletAlias()));
         this.setBypassForGuest(config.getOrDefault(BYPASS_FOR_GUEST, "true").equalsIgnoreCase("true"));
         this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ? new ArrayList<>() : List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
         this.setMultipartResolver(new CommonsMultipartResolver());
@@ -87,6 +89,14 @@ public class JahiaCsrfGuardGlobalConfig {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getServletAlias() {
+        return servletAlias;
+    }
+
+    public void setServletAlias(String servletAlias) {
+        this.servletAlias = servletAlias;
     }
 
     public String getServletPath() {
