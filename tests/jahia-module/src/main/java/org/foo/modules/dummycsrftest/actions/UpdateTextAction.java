@@ -59,10 +59,13 @@ public class UpdateTextAction extends Action {
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
             JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
+        LOGGER.info("Executing UpdateTextAction");
         JCRNodeWrapper node = resource.getNode();
-        if (node.isNodeType("jnt:testContent")) {
+        if (node.isNodeType("csrf:testContent")) {
+            LOGGER.info("Updating text property");
             node.setProperty("text", req.getParameter("newText"));
             session.save();
+            LOGGER.info("Text property updated");
             return ActionResult.OK;
         }
         return null;

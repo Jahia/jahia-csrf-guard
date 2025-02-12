@@ -37,7 +37,7 @@ import java.util.*;
  * Global OSGI config for Jahia CSRF Guard.
  * @author Jerome Blanchard
  */
-@Component(immediate = true, service = JahiaCsrfGuardGlobalConfig.class, configurationPid = {"org.jahia.modules.jahiacsrfguard.global"})
+@Component(immediate = true, service = JahiaCsrfGuardGlobalConfig.class, property = "service.pid=org.jahia.modules.jahiacsrfguard.global", configurationPid = "org.jahia.modules.jahiacsrfguard.global")
 public class JahiaCsrfGuardGlobalConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JahiaCsrfGuardGlobalConfig.class.getName());
@@ -64,8 +64,11 @@ public class JahiaCsrfGuardGlobalConfig {
         this.setServletAlias(config.getOrDefault(SERVLET_ALIAS, "/CsrfServlet"));
         this.setServletPath("/modules".concat(this.getServletAlias()));
         this.setBypassForGuest(config.getOrDefault(BYPASS_FOR_GUEST, "true").equalsIgnoreCase("true"));
-        this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ? new ArrayList<>() : List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
+        this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ?
+                new ArrayList<>() :
+                List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
         this.setMultipartResolver(new CommonsMultipartResolver());
+        LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);
     }
 
     public String get(String configKey) {
@@ -145,6 +148,6 @@ public class JahiaCsrfGuardGlobalConfig {
 
     @Override public String toString() {
         return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + enabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
-                + bypassForGuest + '}';
+                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + '}';
     }
 }

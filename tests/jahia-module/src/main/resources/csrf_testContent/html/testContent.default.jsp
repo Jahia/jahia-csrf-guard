@@ -31,19 +31,21 @@
 
     var jahiaDummyCsrfTest = {
         csrfTestAction: function () {
-            $.post('${modifyTextActionURL}', {newText: 'Hello Mars!'},
-                function (result) {
-                    console.log(result);
-                    window.location.reload();
-                }, 'json');
+            console.log('Calling CSRF test action to say Hello Mars!');
+            $.ajax({
+                type: 'POST',
+                url: '${modifyTextActionURL}',
+                data: {newText: 'Hello Mars!'},
+                dataType: 'json'
+            }).always(function () {
+                window.location.reload();
+            });
         }
     };
 </script>
 
-<a href="${dummyActionURL}" class="btn btn-primary" id="csrfLink">Call To Dummy Action (GET)</a>
-
 <form method="POST" action="${modifyTextActionURL}" id="csrfForm">
-    <input type="hidden" name="jcrNodeType" value="jnt:testContent">
+    <input type="hidden" name="jcrNodeType" value="csrf:testContent">
     <input type="hidden" name="jcrRedirectTo" value="<c:url value='${url.base}${renderContext.mainResource.node.path}'/>">
     <input type="hidden" name="jcrResourceID" value="${currentNode.identifier}">
     <input type="hidden" name="newText" value="Hello Planet!">
@@ -51,3 +53,8 @@
 </form>
 
 <button onclick="jahiaDummyCsrfTest.csrfTestAction()" type="button">Say Hello Mars</button>
+<br/>
+<br/>
+<a href="${dummyActionURL}" class="btn btn-primary" id="csrfLink">Call To Dummy Action (GET)</a>
+
+

@@ -15,7 +15,6 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.bin.filters.CompositeFilter;
@@ -37,9 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +54,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
-    private String bundleTag;
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
     private volatile JahiaCsrfGuardGlobalConfig config;
 
@@ -69,7 +65,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         setUrlPatterns(new String[]{"/*"});
         setDispatcherTypes(Set.of(DispatcherType.REQUEST.name(), DispatcherType.FORWARD.name()));
         setOrder(1.1f);
-        this.bundleTag = context.getBundle().getVersion().toString().concat("-").concat(String.valueOf(context.getBundle().getBundleId()));
     }
 
     private void setConfig(JahiaCsrfGuardGlobalConfig config) {
@@ -128,7 +123,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             LOGGER.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
 
             int indexOfCloseHeadTag = closeHeadTagMatcher.start();
-            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath(), ((HttpServletRequest) request).getSession().getId());
+            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath());
 
             PrintWriter writer = response.getWriter();
             writer.write(originalContent.substring(0, indexOfCloseHeadTag));
@@ -161,9 +156,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         return !config.bypassForGuest() || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
     }
 
-    @SuppressWarnings("java:S3457")
-    private String buildCodeSnippet(String contextPath, String sessionId) {
-        String src = contextPath.concat(config.getServletPath()).concat("?").concat(getTag(sessionId));
+    private String buildCodeSnippet(String contextPath) {
+        String src = contextPath.concat(config.getServletPath());
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -201,10 +195,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         public boolean isWriterUsed() {
             return writerUsed;
         }
-    }
-
-    private String getTag(String sessionId) {
-        return DigestUtils.md5Hex(sessionId.concat(bundleTag));
     }
 
 }

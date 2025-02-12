@@ -43,6 +43,26 @@ describe('Base CSRF tests', () => {
             });
     });
 
+    it('should be able to call action as ROOT', () => {
+        cy.login();
+        cy.visit('/en/sites/' + targetSiteKey + '/home.html');
+        cy.get('head script[src^="/modules/CsrfServlet"]').should('exist');
+        cy.get('a#csrfLink')
+            .should(link => {
+                const href = link.attr('href');
+                expect(href).to.contain('CSRFTOKEN');
+            });
+        cy.get('input[name="CSRFTOKEN"]').should('exist');
+        cy.get('h3').should('contain', 'Hello world!');
+        cy.get('form#csrfForm').submit().then(() => {
+            cy.get('h3').should('contain', 'Hello Planet!');
+        });
+        cy.contains('button', 'Say Hello Mars').click().then(() => {
+            cy.get('h3').should('contain', 'Hello Mars!');
+        });
+        cy.logout();
+    });
+
     after('Clean', () => {
         deleteSite(targetSiteKey);
     });

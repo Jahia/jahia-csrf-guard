@@ -23,6 +23,7 @@ import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
 import org.jahia.modules.jahiacsrfguard.token.SessionTokenHolder;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.usermanager.JahiaUser;
+import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -69,7 +70,7 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         setRequestUser(request);
 
         try {
-            if (isGlobalConfigEnabled() && isFiltered(request) && !isWhiteListed(request)) {
+            if (isGlobalConfigEnabled() && matchUser() && isFiltered(request) && !isWhiteListed(request)) {
                 if (request instanceof HttpServletRequest) {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
@@ -127,6 +128,13 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
             return false;
         }
         return globalConfig.isEnabled();
+    }
+
+    /**
+     * Check if CSRF Guard filter should be applied for current user
+     */
+    private boolean matchUser() {
+        return !globalConfig.bypassForGuest() || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
     }
 
     /**
