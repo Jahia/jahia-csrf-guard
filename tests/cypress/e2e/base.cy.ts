@@ -54,9 +54,11 @@ describe('Base CSRF tests', () => {
             });
         cy.get('input[name="CSRFTOKEN"]').should('exist');
         cy.get('h3').should('contain', 'Hello world!');
+        // eslint-disable-next-line cypress/unsafe-to-chain-command
         cy.get('form#csrfForm').submit().then(() => {
             cy.get('h3').should('contain', 'Hello Planet!');
         });
+        // eslint-disable-next-line cypress/unsafe-to-chain-command
         cy.contains('button', 'Say Hello Mars').click().then(() => {
             cy.get('h3').should('contain', 'Hello Mars!');
         });
