@@ -11,11 +11,7 @@ export const updateCsrfGuardWhiteListConfig = (whitelist?: string) => {
         }
     };
 
-    cy.runProvisioningScript({fileContent: JSON.stringify([conf]), type: 'application/json'}, null, {
-        url: Cypress.env('JAHIA_PROCESSING_URL'),
-        password: Cypress.env('SUPER_USER_PASSWORD'),
-        username: 'root'
-    });
+    cy.runProvisioningScript({fileContent: JSON.stringify([conf]), type: 'application/json'}, null);
     if (Cypress.env('JAHIA_CLUSTER_ENABLED')) {
         // Wait to allow to synchronize in cluster
         // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -35,11 +31,7 @@ export const updateCsrfGuardBypassGuest = (bypass: boolean) => {
         }
     };
 
-    cy.runProvisioningScript({fileContent: JSON.stringify([conf]), type: 'application/json'}, null, {
-        url: Cypress.env('JAHIA_PROCESSING_URL'),
-        password: Cypress.env('SUPER_USER_PASSWORD'),
-        username: 'root'
-    });
+    cy.runProvisioningScript({fileContent: JSON.stringify([conf]), type: 'application/json'}, null);
     if (Cypress.env('JAHIA_CLUSTER_ENABLED')) {
         // Wait to allow to synchronize in cluster
         // eslint-disable-next-line cypress/no-unnecessary-waiting

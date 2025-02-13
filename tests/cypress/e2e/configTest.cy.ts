@@ -1,7 +1,7 @@
 import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
 import {updateCsrfGuardWhiteListConfig} from '../utils/utils';
 
-describe.skip('Config CSRF tests', () => {
+describe('Config CSRF tests', () => {
     const targetSiteKey = 'csrfGuardSite';
     before('Create target test site', () => {
         cy.log('Create site ' + targetSiteKey + ' for csrf tests');
@@ -24,10 +24,11 @@ describe.skip('Config CSRF tests', () => {
 
     it('should be removed from the whitelist', () => {
         cy.login();
+        cy.request({method: 'POST', url: '/en/sites/' + targetSiteKey + '/home.logAction.do', failOnStatusCode: true}).its('status').should('equal', 200);
         updateCsrfGuardWhiteListConfig('*.toto.do');
-        cy.request({url: '/en/sites/' + targetSiteKey + '/home.logAction.do', failOnStatusCode: false}).its('status').should('equal', 404);
+        cy.request({method: 'POST', url: '/en/sites/' + targetSiteKey + '/home.logAction.do', failOnStatusCode: false}).its('status').should('equal', 400);
         updateCsrfGuardWhiteListConfig('*.logAction.do');
-        cy.request({url: '/en/sites/' + targetSiteKey + '/home.logAction.do', failOnStatusCode: true}).its('status').should('equal', 200);
+        cy.request({method: 'POST', url: '/en/sites/' + targetSiteKey + '/home.logAction.do', failOnStatusCode: true}).its('status').should('equal', 200);
         cy.logout();
     });
 
