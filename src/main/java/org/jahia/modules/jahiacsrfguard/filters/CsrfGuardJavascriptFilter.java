@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.owasp.csrfguard.servlet.JavaScriptServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +124,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             LOGGER.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
 
             int indexOfCloseHeadTag = closeHeadTagMatcher.start();
-            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath());
+            String codeSnippet = buildCodeSnippet(httpRequest);
 
             PrintWriter writer = response.getWriter();
             writer.write(originalContent.substring(0, indexOfCloseHeadTag));
@@ -156,8 +157,8 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         return !config.bypassForGuest() || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
     }
 
-    private String buildCodeSnippet(String contextPath) {
-        String src = contextPath.concat(config.getServletPath());
+    private String buildCodeSnippet(HttpServletRequest request) {
+        String src = request.getContextPath().concat(config.getServletPath()).concat("?").concat(JavaScriptServlet.getJavaScriptEtag(request));
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
