@@ -23,8 +23,8 @@
  */
 package org.jahia.modules.jahiacsrfguard;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.listeners.JahiaContextLoaderListener;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -44,61 +44,61 @@ public class JahiaCsrfGuardService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(JahiaCsrfGuardService.class);
 
-    private boolean registered = false;
-    private String registeredAlias = "";
-
     @Reference
     protected HttpService httpService;
 
+    @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY)
     private JahiaCsrfGuardGlobalConfig config;
+
+    private String registeredAlias = "";
 
     public JahiaCsrfGuardService() {
         LOGGER.debug("Building Jahia CSRF Guard service...");
     }
 
     @Activate
-    public void activate(BundleContext context) throws Exception {
+    public void activate() {
         LOGGER.info("Jahia CSRF Guard service starting");
-        this.handleConfigChange();
+        this.unregister();
+        if (config.isEnabled()) {
+            this.register();
+        } else {
+            LOGGER.info("Jahia CSRF Guard service is disabled");
+        }
     }
 
     @Deactivate
-    public void stop(BundleContext context) throws Exception {
+    public void stop() {
         LOGGER.info("Jahia CSRF Guard service stopping");
+        this.unregister();
     }
 
-    @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
-    private void setConfig(JahiaCsrfGuardGlobalConfig config) throws ServletException, NamespaceException {
-        this.config = config;
-        if (httpService == null ) {
-            LOGGER.info("Jahia CSRF Guard config with {} entries did not update the service as not fully started yet.", config.getSize());
-            return;
-        }
-        this.handleConfigChange();
-    }
-
-    private void unsetConfig(JahiaCsrfGuardGlobalConfig config) {
-        this.config = null;
-    }
-
-    private void handleConfigChange() throws ServletException, NamespaceException {
-        LOGGER.debug("Handle Jahia CSRF Guard service config change");
-        if (registered) {
+    private void unregister() {
+        if (StringUtils.isNotBlank(registeredAlias)) {
             LOGGER.info("Unregistering Jahia CSRF Guard JavaScriptServlet...");
-            httpService.unregister(registeredAlias);
-            registered = false;
+            try {
+                httpService.unregister(registeredAlias);
+            } catch (IllegalArgumentException e) {
+                LOGGER.error("Error while unregistering Jahia CSRF Guard JavaScriptServlet", e);
+            }
             registeredAlias = "";
         }
-        if (config.isEnabled()) {
-            LOGGER.info("Registering Jahia CSRF Guard JavaScriptServlet...");
+    }
+
+    private void register() {
+        LOGGER.info("Registering Jahia CSRF Guard JavaScriptServlet...");
+        if (httpService == null ) {
+            LOGGER.error("Unable to register servlet as HttpService is not available yet.");
+            return;
+        }
+        try {
             httpService.registerServlet(config.getServletAlias(), new JavaScriptServlet(), null, null);
-            registered = true;
             registeredAlias = config.getServletAlias();
             CsrfGuardServletContextListener csrfGuardServletContextListener = new CsrfGuardServletContextListener();
             csrfGuardServletContextListener.contextInitialized(new ServletContextEvent(JahiaContextLoaderListener.getServletContext()));
             LOGGER.info("Jahia CSRF Guard JavaScriptServlet registered at path: {}", config.getServletPath());
-        } else {
-            LOGGER.info("Jahia CSRF Guard service is disabled");
+        } catch (ServletException | NamespaceException e) {
+            LOGGER.error("Error while registering Jahia CSRF Guard JavaScriptServlet", e);
         }
     }
 }

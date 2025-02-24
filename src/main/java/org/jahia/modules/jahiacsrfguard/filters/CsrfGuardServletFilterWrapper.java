@@ -24,10 +24,7 @@ import org.jahia.modules.jahiacsrfguard.token.SessionTokenHolder;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.services.usermanager.JahiaUserManagerService;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.owasp.csrfguard.CsrfGuardFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +43,10 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsrfGuardServletFilterWrapper.class);
 
-    private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
+    @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY)
     private volatile JahiaCsrfGuardGlobalConfig globalConfig;
+
+    private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
     private CsrfGuardFilter csrfGuardFilter;
 
     @Activate
@@ -59,7 +58,7 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         csrfGuardFilter = new CsrfGuardFilter();
         csrfGuardFilter.init(filterConfig);
     }
@@ -70,12 +69,10 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         setRequestUser(request);
 
         try {
-            if (isGlobalConfigEnabled() && matchUser() && isFiltered(request) && !isWhiteListed(request)) {
-                if (request instanceof HttpServletRequest) {
-                    HttpServletRequest httpRequest = (HttpServletRequest) request;
-                    request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
-                            : globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
-                }
+            if (isEnabled() && matchUser() && isFiltered(request) && !isWhiteListed(request)) {
+                HttpServletRequest httpRequest = (HttpServletRequest) request;
+                request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
+                        : globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
                 csrfGuardFilter.doFilter(request, response, chain);
                 return;
             }
@@ -98,10 +95,6 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         csrfGuardFilter.destroy();
     }
 
-    public JahiaCsrfGuardGlobalConfig getGlobalConfig() {
-        return globalConfig;
-    }
-
     @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
     public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
         LOGGER.debug("Setting configurations from factory");
@@ -113,20 +106,7 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         this.configs = new HashSet<>();
     }
 
-    @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setGlobalConfig", unbind = "unsetGlobalConfig")
-    public void setGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
-        this.globalConfig = globalConfig;
-    }
-
-    public void unsetGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
-        this.globalConfig = null;
-    }
-
-    public boolean isGlobalConfigEnabled() {
-        if (globalConfig == null) {
-            LOGGER.warn("Global configuration is not set, unable to apply CSRF Guard filter");
-            return false;
-        }
+    public boolean isEnabled() {
         return globalConfig.isEnabled();
     }
 

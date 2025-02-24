@@ -26,7 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +51,9 @@ import java.util.regex.Pattern;
 public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsrfGuardJavascriptFilter.class);
-
     private static final Pattern CLOSE_HEAD_TAG_PATTERN = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
 
-    @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
+    @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY)
     private volatile JahiaCsrfGuardGlobalConfig config;
 
     @Activate
@@ -67,14 +66,6 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         setOrder(1.1f);
     }
 
-    private void setConfig(JahiaCsrfGuardGlobalConfig config) {
-        this.config = config;
-    }
-
-    private void unsetConfig(JahiaCsrfGuardGlobalConfig config) {
-        this.config = null;
-    }
-
     @Override
     public void init(FilterConfig filterConfig) {
     }
@@ -85,7 +76,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (config == null || !config.isEnabled()) {
+        if (!config.isEnabled()) {
             chain.doFilter(request, response);
             return;
         }
@@ -172,7 +163,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
 
         @Override
-        public PrintWriter getWriter() throws IOException {
+        public PrintWriter getWriter() {
             writerUsed = true;
             return new PrintWriter(writer);
         }
