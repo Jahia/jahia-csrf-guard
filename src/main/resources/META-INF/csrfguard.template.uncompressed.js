@@ -694,6 +694,7 @@ if (owaspCSRFGuardScriptHasLoaded !== true) {
 
                     /**
                      * For the library to function correctly, all the URLs must start with a forward slash (/)
+                     * or with a full qualified domain name starting with http://, https:// or //
                      * Parameters must be removed from the URL
                      */
                     var normalizeUrl = function(url) {

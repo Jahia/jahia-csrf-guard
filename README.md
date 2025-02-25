@@ -3,6 +3,15 @@
 This module will add CSRF token protection on all call to a Jahia Action.
 It's based on [OWASP CSRFGuard library](https://owasp.org/www-project-csrfguard/). 
 
+The module act as a Wrapper over the OWASP library. It integrates with Jahia using 2 Servlet Filters : 
+ - CsrfGuardFilter : This filter will inject a <script> tag in relevant responses (HTML) to add a reference to CSRF javascript file.
+ - CsrfGuardServletFilterWrapper: This filter will introduce a configurable pattern allowing some URLs to be protected or not by CSRF Filter
+All the configuration and registration of the OWASP library is done in the module using OSGI configuration.
+Two level of configuration are possible, a global level providing options for the whole wrapper and a per module configuration that manage fine grain
+configuration patterns.
+The original JavaScriptServlet is registered at startup by the module and will serve the CSRF javascript file on GET requests and handle POST requests to retrieve per-page tokens.
+All original OWASP library configuration options can be override using OSGI configuration.
+
 ### How to upgrade OWASP CSRFGuard
 
 #### Minor version
