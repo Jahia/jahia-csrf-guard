@@ -9,7 +9,7 @@ The module act as a Wrapper over the OWASP library. It integrates with Jahia usi
 All the configuration and registration of the OWASP library is done in the module using OSGI configuration.
 Two level of configuration are possible, a global level providing options for the whole wrapper and a per module configuration that manage fine grain
 configuration patterns.
-The original JavaScriptServlet is registered at startup by the module and will serve the CSRF javascript file on GET requests and handle POST requests to retrieve per-page tokens.
+The original JavaScriptServlet is registered at startup by the module and will serve the CSRF javascript file.
 All original OWASP library configuration options can be override using OSGI configuration.
 
 ### How to upgrade OWASP CSRFGuard
