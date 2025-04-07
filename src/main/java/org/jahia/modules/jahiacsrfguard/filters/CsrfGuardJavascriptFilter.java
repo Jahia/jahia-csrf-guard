@@ -27,11 +27,13 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.owasp.csrfguard.servlet.JavaScriptServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.CharArrayWriter;
@@ -114,7 +116,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
             LOGGER.debug("Adding CSRFGuard JS to '{}'", httpRequest.getRequestURI());
 
             int indexOfCloseHeadTag = closeHeadTagMatcher.start();
-            String codeSnippet = buildCodeSnippet(httpRequest.getContextPath());
+            String codeSnippet = buildCodeSnippet(httpRequest);
 
             PrintWriter writer = response.getWriter();
             writer.write(originalContent.substring(0, indexOfCloseHeadTag));
@@ -147,8 +149,10 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         return !config.bypassForGuest() || !JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser());
     }
 
-    private String buildCodeSnippet(String contextPath) {
-        String src = contextPath.concat(config.getServletPath());
+    private String buildCodeSnippet(HttpServletRequest request) {
+        JavaScriptServletRequestWrapper requestWrapper = new JavaScriptServletRequestWrapper(request, request.getContextPath().concat("/modules"), config.getServletAlias());
+        String etag = JavaScriptServlet.getJavaScriptEtag(requestWrapper);
+        String src = request.getContextPath().concat(config.getServletPath()).concat("?tag=").concat(etag);
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -188,4 +192,24 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
+    public class JavaScriptServletRequestWrapper extends HttpServletRequestWrapper {
+        private final String customContextPath;
+        private final String customServletPath;
+
+        public JavaScriptServletRequestWrapper(HttpServletRequest request, String customContextPath, String customServletPath) {
+            super(request);
+            this.customContextPath = customContextPath;
+            this.customServletPath = customServletPath;
+        }
+
+        @Override
+        public String getContextPath() {
+            return customContextPath != null ? customContextPath : super.getContextPath();
+        }
+
+        @Override
+        public String getServletPath() {
+            return customServletPath != null ? customServletPath : super.getServletPath();
+        }
+    }
 }
