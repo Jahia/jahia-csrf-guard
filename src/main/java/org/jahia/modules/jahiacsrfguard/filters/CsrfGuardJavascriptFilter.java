@@ -150,9 +150,13 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
     }
 
     private String buildCodeSnippet(HttpServletRequest request) {
-        JavaScriptServletRequestWrapper requestWrapper = new JavaScriptServletRequestWrapper(request, request.getContextPath().concat("/modules"), config.getServletAlias());
-        String etag = JavaScriptServlet.getJavaScriptEtag(requestWrapper);
-        String src = request.getContextPath().concat(config.getServletPath()).concat("?tag=").concat(etag);
+        String src = request.getContextPath().concat(config.getServletPath());
+        if (!JahiaUserManagerService.isGuest(JCRSessionFactory.getInstance().getCurrentUser())) {
+            JavaScriptServletRequestWrapper requestWrapper = new JavaScriptServletRequestWrapper(request,
+                    request.getContextPath().concat("/modules"), config.getServletAlias());
+            String etag = JavaScriptServlet.getJavaScriptEtag(requestWrapper);
+            src = src.concat("?tag=").concat(etag);
+        }
         return String.format("<script type=\"text/javascript\" src=\"%s\"></script>\n", src);
     }
 
@@ -192,7 +196,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
     }
 
-    public class JavaScriptServletRequestWrapper extends HttpServletRequestWrapper {
+    public static class JavaScriptServletRequestWrapper extends HttpServletRequestWrapper {
         private final String customContextPath;
         private final String customServletPath;
 
