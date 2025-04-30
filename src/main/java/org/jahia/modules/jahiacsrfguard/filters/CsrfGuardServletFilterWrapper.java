@@ -15,7 +15,6 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfig;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfigFactory;
@@ -71,8 +70,9 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
         try {
             if (isEnabled() && matchUser() && isFiltered(request) && !isWhiteListed(request)) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
-                request = !ServletFileUpload.isMultipartContent(httpRequest) ? request
-                        : globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
+                if (request.getContentType() != null && request.getContentType().toLowerCase().startsWith("multipart/")) {
+                    request = globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
+                }
                 csrfGuardFilter.doFilter(request, response, chain);
                 return;
             }
@@ -97,12 +97,12 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
 
     @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
     public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
-        LOGGER.debug("Setting configurations from factory");
+        LOGGER.debug("Setting configurations from factory: {}", configFactory.getName());
         this.configs = configFactory.getConfigs();
     }
 
     public void clearConfigs(JahiaCsrfGuardConfigFactory configFactory) {
-        LOGGER.debug("Clearing configurations from factory");
+        LOGGER.debug("Clearing configurations from factory: {}", configFactory.getName());
         this.configs = new HashSet<>();
     }
 
