@@ -42,7 +42,7 @@
         <csrfguard.version>4.5.0</csrfguard.version>
         <jahia.plugin.version>6.12</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
-        <jahia-module-signature>MC0CFQCV4PBIdJhVVMxsCWm1TXt0DjJtqgIUfKkgn6VUx5AZig0ZZ/NMR99vmnQ=</jahia-module-signature>
+        <jahia-module-signature>MC0CFQCW+DWFs42Lt4b7yBZW1yUmZDlCWgIUSmPmmxtZHg1TdNqojnAqpBVvPjU=</jahia-module-signature>
     </properties>
 
     <repositories>
