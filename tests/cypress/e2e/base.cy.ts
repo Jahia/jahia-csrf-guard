@@ -33,6 +33,7 @@ describe('Base CSRF tests', () => {
             });
         // Doing the same as guest should not contain CSRF Tokens
         cy.logout();
+        cy.clearAllCookies(); // Clear all cookies to be sure we are not logged in
         cy.log('The page should NOT contains CSRF Tokens when not logged');
         cy.visit('/en/sites/' + targetSiteKey + '/home.html');
         cy.get('head script[src^="/modules/CsrfServlet"]').should('not.exist');
