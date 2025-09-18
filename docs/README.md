@@ -52,7 +52,7 @@ As with any OSGI configuration, they can be created/edited either on the filesys
 
 ### Use cases
 
-#### Disabling CSRF guard entirely
+#### Disabling CSRF guard entirely
 
 If needed, you can disable CSRF guard module entirely with this parameter:
 
@@ -63,7 +63,7 @@ org.owasp.csrfguard.Enabled = false
 This should be a temporary solution, it is not recommended to keep CSRF guard disabled.
 
 
-#### Disabling CSRF-guard for an action
+#### Disabling CSRF-guard for an action
 
 When developing your own module, it might be necessary to disable the CSRF token mechanism for a specific action, for instance when the action does not trigger any state changes, or when this action is aimed at being called by an external tool (such as curl).
 
@@ -75,7 +75,7 @@ whitelist = *.action1.do,*.action2.do
 
 You can find an example of such a configuration in the [saml-authentication-valve codebase](https://github.com/Jahia/saml-authentication-valve/blob/dd3b68c1bc7fba48de8eca4444861ac516ec5bc2/src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-saml.cfg).
 
-#### Referer check does not match the protocol
+#### Referer check does not match the protocol
 
 When the SSL termination is established on a reverse proxy but that proxy communicates with Jahia via HTTP, you may see the following error in logs:
 
@@ -91,7 +91,7 @@ Alternatively, you could also set the following property:
 org.owasp.csrfguard.JavascriptServlet.refererMatchProtocol = false
 ```
 
-#### Using tokens per page
+#### Using tokens per page
 
 It is possible to enable the creation of random unique tokens per-page (and session) as opposed to just a unique per-session token, which then is the same on all pages. This in-depth defense strategy limit the impact of leaked CSRF tokens. 
 
