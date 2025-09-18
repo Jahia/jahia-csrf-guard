@@ -63,7 +63,7 @@ This should be a temporary solution, it is not recommended to keep CSRF guard di
 
 #### Disabling CSRF-guard for an action
 
-When developing your own module, it might be necessary to disable the CSRF token mechanism for a specific action, for instance when the action does not trigger any state changes.
+When developing your own module, it might be necessary to disable the CSRF token mechanism for a specific action, for instance when the action does not trigger any state changes, or when this action is aimed at being called by an external tool (such as curl).
 
 In such cases you would create a configuration in your module and whitelist the corresponding action using this parameter:
 
@@ -98,9 +98,6 @@ With a leaked token per-session a CSRF attack could be carried out against any f
 Starting with Jahia 8.2.0, the token per-page implementation is activated by default. 
 
 Note that it requires testing and possible code changes within custom templates or modules. You should especially check that the back button of the browser or a form re-submit in the same session still works as expected. Issues might also arise AJAX requests to actions are performed during the page initialization phase (see [this discussion](https://github.com/OWASP/www-project-csrfguard/issues/49#issuecomment-1006451596) for hints about possible solutions). 
-
-Using tokens per-page may reveal a mistake, when HTML fragments using tokens are getting cached in Jahia. You have to set a view related cache.expiration property to 0 (see [View Caching](/cms/{mode}/{lang}/sites/academy/home/get-started/java-developers/view-caching.html)).
-
 
 The usage of tokens per-page can be deactivated in Jahia 8.1+ by setting the following property in /karaf/etc/org.owasp.csrfguard.cfg:
 
