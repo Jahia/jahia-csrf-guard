@@ -13,7 +13,7 @@ This means of protection injects a unique token in HTML pages for authenticated 
 
 ### Overview
 
-When enabled on a site, the jahia-csrf-guard module injects a javascript script inside pages for **authenticated users**, the role of this script is to add a CSRFTOKEN parameter in various HTML tags and opertaions.
+When enabled on a site, the jahia-csrf-guard module injects a javascript script inside pages for **authenticated users**, the role of this script is to add a CSRFTOKEN parameter in various HTML tags and operations.
 
 The following elements are modified by the script:
  - a hidden `CSRFTOKEN` form input is added to HTML forms
