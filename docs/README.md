@@ -79,7 +79,7 @@ When the SSL termination is established on a reverse proxy but that proxy commun
 ERROR [CsrfGuard] - Referer domain https://<your-page> does not match request domain: http://<your-page>
 ```
 
-This mean your environment is not configured properly, you can find more details about how to address this issue [on this page](/cms/{mode}/{lang}/sites/academy/contents/knowledge-base/2018/dx-links-are-not-in-https.html).
+This means your environment is not configured properly, you can find more details about how to address this issue [on this page](/cms/{mode}/{lang}/sites/academy/contents/knowledge-base/2018/dx-links-are-not-in-https.html).
 
 Alternatively, you could also set the following property:
 
