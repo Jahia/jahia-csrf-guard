@@ -9,7 +9,9 @@ content:
 
 Installed by default, Jahia CSRF Guard is a wrapper around the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfguard/), providing CSRF token protection for all Jahia Actions with the usage of secure random tokens.
 
-This means of protection injects a unique token in HTML pages for authenticated users. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation.
+This means of protection injects a unique token in HTML pages for **authenticated users**. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation, protecting against man-in-the-middle attacks.
+
+The CSRF Guard module is only relevant in the context of authenticated user since its role is to protect against impersonation. Such mechanisms are not relevant for guest users, not being authenticated, their level of authorization is the same for all visitors (including potential attackers).
 
 ### Overview
 
@@ -119,4 +121,10 @@ For authenticated users (or when bypass is disabled), a `tag` parameter is added
 
 ```
 <script type="text/javascript" src="/modules/CsrfServlet?tag=4301DD53426AC0B4A506226442AAB8F8"></script>
+```
+
+The client cach strategy can also be modified using the following property:
+
+```
+org.owasp.csrfguard.JavascriptServlet.cacheControlTagged = private, max-age=600
 ```
