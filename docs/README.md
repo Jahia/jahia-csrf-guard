@@ -11,7 +11,7 @@ Installed by default, Jahia CSRF Guard is a wrapper around the [OWASP CSRFGuard 
 
 This means of protection injects a unique token in HTML pages for authenticated users. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation.
 
-### Overview
+## Overview
 
 When enabled on a site, the jahia-csrf-guard module injects a javascript script inside pages for **authenticated users**, the role of this script is to add a CSRFTOKEN parameter in various HTML tags and operations.
 
@@ -32,7 +32,7 @@ The version of the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfg
 Note that the javascript code that will be injected into the pages is a slightly modified version of the original OWASP project, this was done to better integrate with Jahia.
 :::
 
-### Module Configuration
+## Module Configuration
 
 The module configuration is entirely based upon the OWASP's configuration [extensively detailed in their GitHub repository](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties). This page will provide concrete sample and use cases, but you are encouraged to review [the official csrfguard.properties](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties) file for more details about all of the available options.
 
@@ -46,9 +46,9 @@ Configuration stored at a module level overwrite the global configuration.
 
 As with any OSGI configuration, they can be created/edited either on the filesystem, via the OSGI console in Jahia Tools, or via the APIs (GraphQL, provisioning).
 
-### Use cases
+## Use cases
 
-#### Disabling CSRF guard entirely
+### Disabling CSRF guard entirely
 
 If needed you can disable CSRF guard module entirely with this parameter applied to the global configuration:
 
@@ -59,7 +59,7 @@ org.owasp.csrfguard.Enabled = false
 This should be a temporary solution, it is not recommended to keep CSRF guard disabled.
 
 
-#### Disabling CSRF-guard for an action
+### Disabling CSRF-guard for an action
 
 When developing your own module, it might be necessary to disable the CSRF token mechanism for an action, for instance when the action does not trigger any state changes.
 
@@ -71,7 +71,7 @@ whitelist = *.action1.do,*.action2.do
 
 You can find an example of such a configuration in the [saml-authentication-valve codebase](https://github.com/Jahia/saml-authentication-valve/blob/dd3b68c1bc7fba48de8eca4444861ac516ec5bc2/src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-saml.cfg).
 
-#### Referer check does not match the protocol
+### Referer check does not match the protocol
 
 When the SSL termination is established on a reverse proxy but that proxy communicates with Jahia via HTTP, you may see the following error in logs:
 
@@ -87,7 +87,7 @@ Alternatively, you could also set the following property:
 org.owasp.csrfguard.JavascriptServlet.refererMatchProtocol = false
 ```
 
-#### Using tokens per page
+### Using tokens per page
 
 Starting from jahia-csrf-guard version 3.0.0, it is possible to enable the creation of random unique tokens per-page (and session) as opposed to just a unique per-session prevention token, which then is the same on all pages. This is a defense in depth strategy to limit the impact, whenever a token gets leaked to an attacker. With a leaked token per-session a CSRF attack could be carried out against any form or action in the entire webapp, as long as the victim's session is active. With a token per-page the CSRF attack could only be carried out against a small subset of resources.
 
@@ -99,7 +99,7 @@ The usage of tokens per-page can be deactivated in Jahia 8.1+ with setting the f
 org.owasp.csrfguard.TokenPerPage = false
 ```
 
-### Caching considerations
+## Caching considerations
 
 Starting from jahia-csrf-guard 4.2.0, CSRF guard javascript injection is disabled for guest users (unauthenticated users) by default.
 
