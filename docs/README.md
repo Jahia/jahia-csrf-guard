@@ -34,7 +34,7 @@ Note that the javascript code that will be injected into the pages is a slightly
 
 ### Module Configuration
 
-The module configuration is entirely based upon the OWASP's configuration [extensively detailed in their GitHub repository](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties). This page will provide concrete sample and use cases, but you are encouraged to review [the official csrfguart.properties](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties) file for more details about all of the available options.
+The module configuration is entirely based upon the OWASP's configuration [extensively detailed in their GitHub repository](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties). This page will provide concrete sample and use cases, but you are encouraged to review [the official csrfguard.properties](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties) file for more details about all of the available options.
 
 All the configuration and registration of the OWASP library is done in the module using OSGI configuration.
 
