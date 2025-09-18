@@ -123,7 +123,7 @@ For authenticated users (or when bypass is disabled), a `tag` parameter is added
 <script type="text/javascript" src="/modules/CsrfServlet?tag=4301DD53426AC0B4A506226442AAB8F8"></script>
 ```
 
-The client cach strategy can also be modified using the following property:
+The client cache strategy can also be modified using the following property:
 
 ```
 org.owasp.csrfguard.JavascriptServlet.cacheControlTagged = private, max-age=600
