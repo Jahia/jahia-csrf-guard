@@ -9,7 +9,7 @@ content:
 
 Installed by default, Jahia CSRF Guard is a wrapper around the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfguard/), providing CSRF token protection for all Jahia Actions with the usage of secure random tokens.
 
-This mean of protection injects a unique token in HTML pages for authenticated users. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation.
+This means of protection injects a unique token in HTML pages for authenticated users. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation.
 
 ### Overview
 
