@@ -11,7 +11,7 @@ Installed by default, Jahia CSRF Guard is a wrapper around the [OWASP CSRFGuard 
 
 This means of protection injects a unique token in HTML pages for authenticated users. When a user perform an action on that page, the token is submitted and validated by the backend receiving the request. This ensures that requests are actually submitted by the user who performed the operation.
 
-## Overview
+### Overview
 
 When enabled on a site, the jahia-csrf-guard module injects a javascript script inside pages for **authenticated users**, the role of this script is to add a CSRFTOKEN parameter in various HTML tags and operations.
 
@@ -32,7 +32,7 @@ The version of the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfg
 Note that the javascript code that will be injected into the pages is a slightly modified version of the original OWASP project, this was done to better integrate with Jahia.
 :::
 
-## Module Configuration
+### Module Configuration
 
 The module configuration is entirely based upon the OWASP's configuration [extensively detailed in their GitHub repository](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties). This page will provide concrete sample and use cases, but you are encouraged to review [the official csrfguard.properties](https://github.com/aramrami/OWASP-CSRFGuard/blob/master/csrfguard/src/main/resources/csrfguard.properties) file for more details about all of the available options.
 
@@ -42,15 +42,17 @@ Two level of configuration are possible:
 - a global level applied across all sites on the platform. You can modify it editing the properties file located at: `digital-factory-data/karaf/etc/org.owasp.csrfguard.cfg`. Changes to the global configuration are loaded when a modification is done, without needing to stop the jahia-csrf-guard module, this can take up to 60s for changes to be picked up. These changes are automatically propagated on the cluster.
 - a per module configuration that manage fine grain configuration patterns. You can inject these by creating a file in your module's codebase at this location: `src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-test-module.cfg` (replacing `test-module` with your module's artifactId).
 
-Configuration stored at a module level overwrite the global configuration.
+Parameters present in configuration stored at a module level overwrite the global configuration.
 
+:::info
 As with any OSGI configuration, they can be created/edited either on the filesystem, via the OSGI console in Jahia Tools, or via the APIs (GraphQL, provisioning).
+:::
 
-## Use cases
+### Use cases
 
-### Disabling CSRF guard entirely
+#### Disabling CSRF guard entirely
 
-If needed you can disable CSRF guard module entirely with this parameter applied to the global configuration:
+If needed, you can disable CSRF guard module entirely with this parameter:
 
 ```
 org.owasp.csrfguard.Enabled = false
@@ -59,11 +61,11 @@ org.owasp.csrfguard.Enabled = false
 This should be a temporary solution, it is not recommended to keep CSRF guard disabled.
 
 
-### Disabling CSRF-guard for an action
+#### Disabling CSRF-guard for an action
 
-When developing your own module, it might be necessary to disable the CSRF token mechanism for an action, for instance when the action does not trigger any state changes.
+When developing your own module, it might be necessary to disable the CSRF token mechanism for a specific action, for instance when the action does not trigger any state changes.
 
-In such cases you would create a configuration in your module and whitelist the corresponding action (see details about creating a module configuration above).
+In such cases you would create a configuration in your module and whitelist the corresponding action using this parameter:
 
 ```
 whitelist = *.action1.do,*.action2.do
@@ -71,7 +73,7 @@ whitelist = *.action1.do,*.action2.do
 
 You can find an example of such a configuration in the [saml-authentication-valve codebase](https://github.com/Jahia/saml-authentication-valve/blob/dd3b68c1bc7fba48de8eca4444861ac516ec5bc2/src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-saml.cfg).
 
-### Referer check does not match the protocol
+#### Referer check does not match the protocol
 
 When the SSL termination is established on a reverse proxy but that proxy communicates with Jahia via HTTP, you may see the following error in logs:
 
@@ -87,19 +89,26 @@ Alternatively, you could also set the following property:
 org.owasp.csrfguard.JavascriptServlet.refererMatchProtocol = false
 ```
 
-### Using tokens per page
+#### Using tokens per page
 
-Starting from jahia-csrf-guard version 3.0.0, it is possible to enable the creation of random unique tokens per-page (and session) as opposed to just a unique per-session prevention token, which then is the same on all pages. This is a defense in depth strategy to limit the impact, whenever a token gets leaked to an attacker. With a leaked token per-session a CSRF attack could be carried out against any form or action in the entire webapp, as long as the victim's session is active. With a token per-page the CSRF attack could only be carried out against a small subset of resources.
+It is possible to enable the creation of random unique tokens per-page (and session) as opposed to just a unique per-session token, which then is the same on all pages. This in-depth defense strategy limit the impact of leaked CSRF tokens. 
 
-Starting with Jahia 8.2.0, the token per-page implementation is activated by default. Note that it requires testing and possible code changes within custom templates or modules. You should especially check that the back button of the browser or a form re-submit in the same session still works as expected. Furthermore there may be an issue if you call AJAX requests to actions during the page initialization phase (see this linked discussion to get hints about possible solutions). Also starting to use tokens per-page may reveal a mistake, when HTML fragments using tokens are getting cached in Jahia. You have to set a view related cache.expiration property to 0 (see View Caching).
+With a leaked token per-session a CSRF attack could be carried out against any form or action in the entire webapp, as long as the victim's session is active. With a token per-page the CSRF attack could only be carried out against a small subset of resources.
 
-The usage of tokens per-page can be deactivated in Jahia 8.1+ with setting the following property in /karaf/etc/org.owasp.csrfguard.cfg:
+Starting with Jahia 8.2.0, the token per-page implementation is activated by default. 
+
+Note that it requires testing and possible code changes within custom templates or modules. You should especially check that the back button of the browser or a form re-submit in the same session still works as expected. Issues might also arise AJAX requests to actions are performed during the page initialization phase (see [this discussion](https://github.com/OWASP/www-project-csrfguard/issues/49#issuecomment-1006451596) for hints about possible solutions). 
+
+Also starting to use tokens per-page may reveal a mistake, when HTML fragments using tokens are getting cached in Jahia. You have to set a view related cache.expiration property to 0 (see [View Caching](/cms/{mode}/{lang}/sites/academy/home/get-started/java-developers/view-caching.html)).
+
+
+The usage of tokens per-page can be deactivated in Jahia 8.1+ by setting the following property in /karaf/etc/org.owasp.csrfguard.cfg:
 
 ```
 org.owasp.csrfguard.TokenPerPage = false
 ```
 
-## Caching considerations
+### Caching considerations
 
 Starting from jahia-csrf-guard 4.2.0, CSRF guard javascript injection is disabled for guest users (unauthenticated users) by default.
 
