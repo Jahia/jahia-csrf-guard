@@ -18,7 +18,7 @@ When enabled on a site, the jahia-csrf-guard module injects a javascript script 
 The following elements are modified by the script:
  - a hidden `CSRFTOKEN` form input is added to HTML forms
  - a `CSRFTOKEN` parameter is added to `src` or `href` attributes
- - a `CSRFTOKEN` property is added to HTTP headers releated to XHR calls.
+ - a `CSRFTOKEN` property is added to HTTP headers related to XHR calls.
 
 By default, all actions ending with a `.do` will attempt to validate tokens injected by the previously described mechanism. If the token is absent or does not match, the following message is displayed in the browser console: 
 
