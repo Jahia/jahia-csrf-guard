@@ -39,7 +39,7 @@ public class JahiaCsrfGuardConfig {
 
     private String pid;
     private List<Pattern> urlPatterns;
-    private List<Pattern> whitelist;
+    private List<Pattern> whitelistPatterns;
 
     public JahiaCsrfGuardConfig() {
     }
@@ -64,7 +64,7 @@ public class JahiaCsrfGuardConfig {
     }
 
     public void setWhitelist(String whitelist) {
-        this.whitelist = Arrays.stream(whitelist.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
+        this.whitelistPatterns = Arrays.stream(whitelist.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
     }
 
     /**
@@ -103,11 +103,11 @@ public class JahiaCsrfGuardConfig {
      * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied
      */
     public boolean isWhiteListed(ServletRequest request) {
-        if (whitelist == null) {
+        if (whitelistPatterns == null) {
             return false;
         }
         String uri = ((HttpServletRequest) request).getRequestURI();
-        return whitelist.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        return whitelistPatterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
     }
 
     @Override
