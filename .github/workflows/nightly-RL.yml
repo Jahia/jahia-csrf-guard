@@ -13,7 +13,7 @@ jobs:
       jahia_image: jahia/jahia-ee:8
       module_id: jahia-csrf-guard
       testrail_project: Jahia CSRF Guard module
-      pagerduty_incident_service: jahia-csrf-guard-JahiaRL
+      incident_service: jahia-csrf-guard-JahiaRL
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: jahia-csrf-guard
       module_branch: ${{ github.ref }}
