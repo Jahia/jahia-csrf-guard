@@ -60,6 +60,7 @@ jobs:
     uses: Jahia/jahia-modules-action/.github/workflows/reusable-integration-tests.yml@v2
     with:
       module_id: jahia-csrf-guard
+      module_branch: main
       testrail_project: Jahia CSRF Guard module
       provisioning_manifest: provisioning-manifest-build.yml
       incident_service: jahia-csrf-guard-JahiaSN
