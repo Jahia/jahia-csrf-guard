@@ -28,7 +28,7 @@ By default, all actions ending with a `.do` will attempt to validate tokens inje
 [CsrfGuard] - potential cross-site request forgery (CSRF) attack thwarted ....  
 ```
 
-The version of the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfguard/) evolves alongside releases of the jahia-csrf-guard module, you can find the version embedded on the [module's pom.xml (link)](https://github.com/Jahia/jahia-csrf-guard/blob/master/pom.xml#L42).
+The version of the [OWASP CSRFGuard library](https://owasp.org/www-project-csrfguard/) evolves alongside releases of the jahia-csrf-guard module, you can find the version embedded on the [module's pom.xml (link)](https://github.com/Jahia/jahia-csrf-guard/blob/main/pom.xml#L42).
 
 :::info
 Note that the javascript code that will be injected into the pages is a slightly modified version of the original OWASP project, this was done to better integrate with Jahia.
