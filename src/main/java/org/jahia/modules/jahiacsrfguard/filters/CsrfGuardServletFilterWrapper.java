@@ -19,6 +19,7 @@ import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfig;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfigFactory;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardService;
 import org.jahia.modules.jahiacsrfguard.token.SessionTokenHolder;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.usermanager.JahiaUser;
@@ -44,6 +45,9 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
 
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY)
     private volatile JahiaCsrfGuardGlobalConfig globalConfig;
+
+    @Reference(service = JahiaCsrfGuardService.class, cardinality = ReferenceCardinality.MANDATORY)
+    private volatile JahiaCsrfGuardService csrfGuardService;
 
     private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
     private CsrfGuardFilter csrfGuardFilter;
