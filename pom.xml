@@ -40,6 +40,7 @@
 
     <properties>
         <csrfguard.version>4.5.0</csrfguard.version>
+        <commons-fileupload.version>1.6.0</commons-fileupload.version>
         <jahia.plugin.version>6.12</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <jahia-module-signature>MC0CFQCW+DWFs42Lt4b7yBZW1yUmZDlCWgIUSmPmmxtZHg1TdNqojnAqpBVvPjU=</jahia-module-signature>
@@ -107,10 +108,22 @@
             <version>${csrfguard.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons-fileupload.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
