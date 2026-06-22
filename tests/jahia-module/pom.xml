@@ -18,7 +18,7 @@
     <description>This is the custom module (jahia-csrf-guard-test-module) for running on a Jahia server.</description>
 
     <properties>
-        <jahia-depends>default</jahia-depends>
+        <jahia-depends>default,jahia-csrf-guard</jahia-depends>
         <jahia-module-type>templatesSet</jahia-module-type>
     </properties>
 
