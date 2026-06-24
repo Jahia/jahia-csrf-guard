@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.bin.filters.CompositeFilter;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardGlobalConfig;
+import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardService;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUserManagerService;
@@ -57,6 +58,9 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY)
     private volatile JahiaCsrfGuardGlobalConfig config;
+
+    @Reference(service = JahiaCsrfGuardService.class, cardinality = ReferenceCardinality.MANDATORY)
+    private volatile JahiaCsrfGuardService csrfGuardService;
 
     @Activate
     public void activate(BundleContext context) {
