@@ -75,7 +75,11 @@ public class CsrfGuardServletFilterWrapper extends AbstractServletFilter {
             if (isEnabled() && matchUser() && isFiltered(request) && !isWhiteListed(request)) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
                 if (request.getContentType() != null && request.getContentType().toLowerCase().startsWith("multipart/")) {
-                    request = globalConfig.getMultipartResolver().resolveMultipart(new MultiReadHttpServletRequest(httpRequest));
+                    try {
+                        request = new MultipartRequestWrapper(new MultiReadHttpServletRequest(httpRequest));
+                    } catch (org.apache.commons.fileupload.FileUploadException e) {
+                        LOGGER.error("Failed to parse multipart request", e);
+                    }
                 }
                 csrfGuardFilter.doFilter(request, response, chain);
                 return;

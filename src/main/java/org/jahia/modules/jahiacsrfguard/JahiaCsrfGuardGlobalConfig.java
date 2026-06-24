@@ -28,9 +28,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
 import java.util.*;
 
 /**
@@ -53,7 +50,6 @@ public class JahiaCsrfGuardGlobalConfig {
     private String servletPath = "";
     private boolean bypassForGuest = true;
     private List<String> resolvedUrlPatterns = new ArrayList<>();
-    private MultipartResolver multipartResolver;
 
     @Activate
     @Modified
@@ -67,7 +63,6 @@ public class JahiaCsrfGuardGlobalConfig {
         this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ?
                 new ArrayList<>() :
                 List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
-        this.setMultipartResolver(new CommonsMultipartResolver());
         LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);
     }
 
@@ -123,14 +118,6 @@ public class JahiaCsrfGuardGlobalConfig {
         this.resolvedUrlPatterns = resolvedUrlPatterns;
     }
 
-    public MultipartResolver getMultipartResolver() {
-        return multipartResolver;
-    }
-
-    public void setMultipartResolver(MultipartResolver multipartResolver) {
-        this.multipartResolver = multipartResolver;
-    }
-
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -138,12 +125,11 @@ public class JahiaCsrfGuardGlobalConfig {
             return false;
         JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
         return serviceEnabled == that.serviceEnabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
-                && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
-                && Objects.equals(multipartResolver, that.multipartResolver);
+                && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns);
     }
 
     @Override public int hashCode() {
-        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver);
+        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns);
     }
 
     @Override public String toString() {
