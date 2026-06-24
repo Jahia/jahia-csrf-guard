@@ -15,7 +15,6 @@
  */
 package org.jahia.modules.jahiacsrfguard.filters;
 
-import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Test;
 
 import javax.servlet.ReadListener;

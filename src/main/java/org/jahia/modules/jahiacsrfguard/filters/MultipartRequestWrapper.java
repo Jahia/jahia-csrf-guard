@@ -34,8 +34,6 @@ import java.util.*;
  */
 public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultipartRequestWrapper.class);
-
     private final Map<String, List<String>> multipartParameters;
 
     public MultipartRequestWrapper(HttpServletRequest request) throws FileUploadException {
