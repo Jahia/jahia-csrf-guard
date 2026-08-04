@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 /**
@@ -57,8 +58,8 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     /** URLs reached from another site by design: an identity provider posts its assertion back to Jahia on *.saml */
     private static final List<Pattern> BUILT_IN_WHITELIST = Collections.singletonList(JahiaCsrfGuardConfig.createUrlPattern("*.saml"));
 
-    private volatile JahiaCsrfGuardGlobalConfig globalConfig;
-    private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
+    private final AtomicReference<JahiaCsrfGuardGlobalConfig> globalConfig = new AtomicReference<>();
+    private final AtomicReference<Collection<JahiaCsrfGuardConfig>> configs = new AtomicReference<>(new HashSet<>());
 
     @Activate
     public void activate() {
@@ -85,8 +86,10 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         if (isRejected(httpRequest)) {
-            LOGGER.warn("Rejected request (ip:{}, method:{}, uri:{}, {}:{})", httpRequest.getRemoteAddr(), httpRequest.getMethod(),
-                    httpRequest.getRequestURI(), SEC_FETCH_SITE_HEADER, httpRequest.getHeader(SEC_FETCH_SITE_HEADER));
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Rejected request (ip:{}, method:{}, uri:{}, {}:{})", httpRequest.getRemoteAddr(), httpRequest.getMethod(),
+                        httpRequest.getRequestURI(), SEC_FETCH_SITE_HEADER, httpRequest.getHeader(SEC_FETCH_SITE_HEADER));
+            }
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -94,7 +97,8 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     }
 
     boolean isRejected(HttpServletRequest request) {
-        return globalConfig != null && globalConfig.isEnabled() && globalConfig.isFetchMetadataEnabled()
+        JahiaCsrfGuardGlobalConfig currentGlobalConfig = globalConfig.get();
+        return currentGlobalConfig != null && currentGlobalConfig.isEnabled() && currentGlobalConfig.isFetchMetadataEnabled()
                 && isCrossSite(request.getHeader(SEC_FETCH_SITE_HEADER))
                 && isWriteRequest(request)
                 && isFiltered(request) && !isWhiteListed(request);
@@ -159,8 +163,9 @@ public class FetchMetadataFilter extends AbstractServletFilter {
      * predate it.
      */
     private boolean isFiltered(ServletRequest request) {
-        return configs.stream().noneMatch(JahiaCsrfGuardConfig::hasFetchMetadataUrlPatterns)
-                || configs.stream().anyMatch(config -> config.isFetchMetadataFiltered(request));
+        Collection<JahiaCsrfGuardConfig> currentConfigs = configs.get();
+        return currentConfigs.stream().noneMatch(JahiaCsrfGuardConfig::hasFetchMetadataUrlPatterns)
+                || currentConfigs.stream().anyMatch(config -> config.isFetchMetadataFiltered(request));
     }
 
     /**
@@ -170,22 +175,22 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     private boolean isWhiteListed(ServletRequest request) {
         String uri = ((HttpServletRequest) request).getRequestURI();
         return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(uri).matches())
-                || configs.stream().anyMatch(config -> config.isFetchMetadataWhiteListed(request));
+                || configs.get().stream().anyMatch(config -> config.isFetchMetadataWhiteListed(request));
     }
 
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY, unbind = "-")
     public void setGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
-        this.globalConfig = globalConfig;
+        this.globalConfig.set(globalConfig);
     }
 
     @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
     public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
         LOGGER.debug("Setting configurations from factory: {}", configFactory.getName());
-        this.configs = configFactory.getConfigs();
+        this.configs.set(configFactory.getConfigs());
     }
 
     public void clearConfigs(JahiaCsrfGuardConfigFactory configFactory) {
         LOGGER.debug("Clearing configurations from factory: {}", configFactory.getName());
-        this.configs = new HashSet<>();
+        this.configs.set(new HashSet<>());
     }
 }

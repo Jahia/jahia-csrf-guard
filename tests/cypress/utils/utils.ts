@@ -27,7 +27,7 @@ export const updateCsrfGuardFetchMetadataEnabled = (enabled: boolean) => {
         editConfiguration: 'org.jahia.modules.jahiacsrfguard.global',
         configIdentifier: 'global',
         properties: {
-            'jahia.csrf-guard.fetchMetadata.enabled': enabled
+            'jahia.csrf-guard.fetchMetadata.enabled': String(enabled)
         }
     };
 
@@ -47,7 +47,7 @@ export const updateCsrfGuardBypassGuest = (bypass: boolean) => {
         editConfiguration: 'org.jahia.modules.jahiacsrfguard.global',
         configIdentifier: 'global',
         properties: {
-            'jahia.csrf-guard.bypassForGuest': bypass
+            'jahia.csrf-guard.bypassForGuest': String(bypass)
         }
     };
 
