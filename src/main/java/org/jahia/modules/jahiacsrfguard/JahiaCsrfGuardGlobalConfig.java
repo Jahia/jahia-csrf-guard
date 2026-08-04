@@ -43,6 +43,7 @@ public class JahiaCsrfGuardGlobalConfig {
     public static final String SERVLET_ALIAS = "jahia.csrf-guard.servletAlias";
     public static final String BYPASS_FOR_GUEST = "jahia.csrf-guard.bypassForGuest";
     public static final String RESOLVED_URL_PATTERNS = "jahia.csrf-guard.resolvedUrlPatterns";
+    public static final String FETCH_METADATA_ENABLED = "jahia.csrf-guard.fetchMetadata.enabled";
 
     private Map<String, String> config = new HashMap<>();
     private boolean serviceEnabled = true;
@@ -50,6 +51,7 @@ public class JahiaCsrfGuardGlobalConfig {
     private String servletPath = "";
     private boolean bypassForGuest = true;
     private List<String> resolvedUrlPatterns = new ArrayList<>();
+    private boolean fetchMetadataEnabled = true;
 
     @Activate
     @Modified
@@ -63,6 +65,7 @@ public class JahiaCsrfGuardGlobalConfig {
         this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ?
                 new ArrayList<>() :
                 List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
+        this.setFetchMetadataEnabled(config.getOrDefault(FETCH_METADATA_ENABLED, "true").equalsIgnoreCase("true"));
         LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);
     }
 
@@ -118,6 +121,17 @@ public class JahiaCsrfGuardGlobalConfig {
         this.resolvedUrlPatterns = resolvedUrlPatterns;
     }
 
+    /**
+     * @return true when write requests are accepted only from the site's own browsing context
+     */
+    public boolean isFetchMetadataEnabled() {
+        return fetchMetadataEnabled;
+    }
+
+    public void setFetchMetadataEnabled(boolean fetchMetadataEnabled) {
+        this.fetchMetadataEnabled = fetchMetadataEnabled;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -125,15 +139,16 @@ public class JahiaCsrfGuardGlobalConfig {
             return false;
         JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
         return serviceEnabled == that.serviceEnabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
-                && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns);
+                && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
+                && fetchMetadataEnabled == that.fetchMetadataEnabled;
     }
 
     @Override public int hashCode() {
-        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns);
+        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, fetchMetadataEnabled);
     }
 
     @Override public String toString() {
         return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + serviceEnabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
-                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + '}';
+                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + ", fetchMetadataEnabled=" + fetchMetadataEnabled + '}';
     }
 }

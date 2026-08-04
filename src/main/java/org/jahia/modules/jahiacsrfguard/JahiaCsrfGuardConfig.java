@@ -36,10 +36,14 @@ public class JahiaCsrfGuardConfig {
 
     public static final String URL_PATTERNS = "urlPatterns";
     public static final String WHITELIST = "whitelist";
+    public static final String FETCH_METADATA_URL_PATTERNS = "fetchMetadataUrlPatterns";
+    public static final String FETCH_METADATA_WHITELIST = "fetchMetadataWhitelist";
 
     private String pid;
     private List<Pattern> urlPatterns;
     private List<Pattern> whitelistPatterns;
+    private List<Pattern> fetchMetadataUrlPatterns;
+    private List<Pattern> fetchMetadataWhitelistPatterns;
 
     public JahiaCsrfGuardConfig() {
     }
@@ -56,15 +60,35 @@ public class JahiaCsrfGuardConfig {
         if (StringUtils.isNotEmpty(whitelist)) {
             config.setWhitelist(whitelist);
         }
+        String fetchMetadataUrlPatterns = (String) properties.get(FETCH_METADATA_URL_PATTERNS);
+        if (StringUtils.isNotEmpty(fetchMetadataUrlPatterns)) {
+            config.setFetchMetadataUrlPatterns(fetchMetadataUrlPatterns);
+        }
+        String fetchMetadataWhitelist = (String) properties.get(FETCH_METADATA_WHITELIST);
+        if (StringUtils.isNotEmpty(fetchMetadataWhitelist)) {
+            config.setFetchMetadataWhitelist(fetchMetadataWhitelist);
+        }
         return config;
     }
 
     public void setUrlPatterns(String urlPatterns) {
-        this.urlPatterns = Arrays.stream(urlPatterns.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
+        this.urlPatterns = compile(urlPatterns);
     }
 
     public void setWhitelist(String whitelist) {
-        this.whitelistPatterns = Arrays.stream(whitelist.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
+        this.whitelistPatterns = compile(whitelist);
+    }
+
+    public void setFetchMetadataUrlPatterns(String fetchMetadataUrlPatterns) {
+        this.fetchMetadataUrlPatterns = compile(fetchMetadataUrlPatterns);
+    }
+
+    public void setFetchMetadataWhitelist(String fetchMetadataWhitelist) {
+        this.fetchMetadataWhitelistPatterns = compile(fetchMetadataWhitelist);
+    }
+
+    private static List<Pattern> compile(String patterns) {
+        return Arrays.stream(patterns.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
     }
 
     /**
@@ -89,12 +113,7 @@ public class JahiaCsrfGuardConfig {
      * @return true if CsrfGuardFilter should be applied
      */
     public boolean isFiltered(ServletRequest request) {
-        if (urlPatterns == null) {
-            return false;
-        }
-
-        String uri = ((HttpServletRequest) request).getRequestURI();
-        return urlPatterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        return matches(urlPatterns, request);
     }
 
     /**
@@ -103,11 +122,40 @@ public class JahiaCsrfGuardConfig {
      * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied
      */
     public boolean isWhiteListed(ServletRequest request) {
-        if (whitelistPatterns == null) {
+        return matches(whitelistPatterns, request);
+    }
+
+    /**
+     * @return true if this configuration sets the scope of the fetch metadata request policy
+     */
+    public boolean hasFetchMetadataUrlPatterns() {
+        return fetchMetadataUrlPatterns != null;
+    }
+
+    /**
+     * Check url patterns configuration to see whether the fetch metadata request policy applies to the current request
+     * @param request client request object for servlet
+     * @return true if the policy should be applied
+     */
+    public boolean isFetchMetadataFiltered(ServletRequest request) {
+        return matches(fetchMetadataUrlPatterns, request);
+    }
+
+    /**
+     * Check whitelist configuration to see whether the fetch metadata request policy is bypassed for the current request
+     * @param request client request object for servlet
+     * @return true if URL is whitelisted, so the policy should not be applied
+     */
+    public boolean isFetchMetadataWhiteListed(ServletRequest request) {
+        return matches(fetchMetadataWhitelistPatterns, request);
+    }
+
+    private static boolean matches(List<Pattern> patterns, ServletRequest request) {
+        if (patterns == null) {
             return false;
         }
         String uri = ((HttpServletRequest) request).getRequestURI();
-        return whitelistPatterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        return patterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
     }
 
     @Override

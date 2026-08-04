@@ -107,6 +107,46 @@ The usage of tokens per-page can be deactivated in Jahia 8.1+ by setting the fol
 org.owasp.csrfguard.TokenPerPage = false
 ```
 
+### Fetch metadata request policy
+
+Alongside token validation, the module applies a fetch metadata request policy: a request that writes content is served only when the browser reports it as coming from the site's own browsing context.
+
+Modern browsers describe the initiator of every request in the [`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site) request header, and a page cannot alter it. When that header holds `cross-site` and the request writes content, Jahia answers `403` and logs:
+
+```
+WARN  [FetchMetadataFilter] - Rejected request (ip:..., method:POST, uri:..., Sec-Fetch-Site:cross-site)
+```
+
+A request writes content when its HTTP method is `POST`, `PUT`, `DELETE` or `PATCH`, or when it asks Jahia to act upon one of those methods through the `jcrMethodToCall` query parameter. Requests that only read, requests whose initiator is the site itself (`same-origin`, `same-site`), requests the user started themselves (`none`) and requests carrying no such header (non-browser clients, for instance a script or a server-to-server call) are served as usual.
+
+#### Allowing a URL to be reached from another site
+
+Some URLs are reached from another site by design — an identity provider posting an assertion back to Jahia, or a service posting a notification. The SAML callback (`*.saml`) is always exempt; any other URL is exempted by listing it in the `fetchMetadataWhitelist` property of a module configuration, for instance in `src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-test-module.cfg`:
+
+```
+fetchMetadataWhitelist = /my-module/notifications/*
+```
+
+The policy covers all URLs; the `fetchMetadataUrlPatterns` property narrows it down to the URLs you list:
+
+```
+fetchMetadataUrlPatterns = /cms/*, /en/sites/mysite/*
+```
+
+Both properties accept the same comma-separated URL patterns as `urlPatterns` and `whitelist`, and apply across all sites of the platform.
+
+#### Disabling the policy
+
+The policy can be turned off in `/karaf/etc/org.jahia.modules.jahiacsrfguard.global.cfg`:
+
+```
+jahia.csrf-guard.fetchMetadata.enabled = false
+```
+
+:::info
+Only browsers send `Sec-Fetch-*` headers, so this policy complements token validation rather than replacing it. Check that your reverse proxy forwards request headers it does not know, otherwise the policy has nothing to read.
+:::
+
 ### Caching considerations
 
 Starting from jahia-csrf-guard 4.2.0, CSRF guard javascript injection is disabled for guest users (unauthenticated users) by default.
