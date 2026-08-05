@@ -33,6 +33,27 @@ describe('Fetch metadata request policy tests', () => {
         cy.logout();
     });
 
+    /**
+     * Repeat the request until it answers the expected status: a configuration change reaches the module through its
+     * configuration file, which is read at its own pace.
+     */
+    const crossSiteWriteEventuallyAnswers = (expectedStatus: number, remainingAttempts = 25) => {
+        cy.request({
+            method: 'POST',
+            url: actionUrl,
+            headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'cross-site'},
+            failOnStatusCode: false
+        }).then(response => {
+            if (response.status === expectedStatus || remainingAttempts === 0) {
+                expect(response.status).to.equal(expectedStatus);
+            } else {
+                // eslint-disable-next-line cypress/no-unnecessary-waiting
+                cy.wait(2000);
+                crossSiteWriteEventuallyAnswers(expectedStatus, remainingAttempts - 1);
+            }
+        });
+    };
+
     it('should serve a write request reported as same-origin', () => {
         cy.request({
             method: 'POST',
@@ -78,21 +99,11 @@ describe('Fetch metadata request policy tests', () => {
         }).its('status').should('equal', 200);
     });
 
-    it('should serve a write request reported as cross-site once the policy is turned off', () => {
+    it('should follow the configuration switch', () => {
         updateCsrfGuardFetchMetadataEnabled(false);
-        cy.request({
-            method: 'POST',
-            url: actionUrl,
-            headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'cross-site'},
-            failOnStatusCode: true
-        }).its('status').should('equal', 200);
+        crossSiteWriteEventuallyAnswers(200);
         updateCsrfGuardFetchMetadataEnabled(true);
-        cy.request({
-            method: 'POST',
-            url: actionUrl,
-            headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'cross-site'},
-            failOnStatusCode: false
-        }).its('status').should('equal', 403);
+        crossSiteWriteEventuallyAnswers(403);
     });
 
     after('Clean', () => {
