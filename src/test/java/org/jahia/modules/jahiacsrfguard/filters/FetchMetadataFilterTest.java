@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 public class FetchMetadataFilterTest {
 
-    private static final String RENDER_URI = "/fr/users/root";
+    private static final String RENDER_URI = "/en/sites/mysite/home";
 
     private FetchMetadataFilter filter;
 
