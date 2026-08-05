@@ -1,6 +1,7 @@
 package org.jahia.modules.jahiacsrfguard.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jahia.bin.Render;
 import org.jahia.bin.filters.AbstractServletFilter;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfig;
 import org.jahia.modules.jahiacsrfguard.JahiaCsrfGuardConfigFactory;
@@ -51,7 +52,6 @@ public class FetchMetadataFilter extends AbstractServletFilter {
 
     static final String SEC_FETCH_SITE_HEADER = "Sec-Fetch-Site";
     static final String CROSS_SITE = "cross-site";
-    static final String JCR_METHOD_TO_CALL = "jcrMethodToCall";
 
     private static final Set<String> WRITE_METHODS = new HashSet<>(Arrays.asList("POST", "PUT", "DELETE", "PATCH"));
 
@@ -147,7 +147,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
         }
         for (String pair : StringUtils.split(queryString, '&')) {
             String name = decode(StringUtils.substringBefore(pair, "="));
-            if (JCR_METHOD_TO_CALL.equals(name) && isWriteMethod(decode(StringUtils.substringAfter(pair, "=")))) {
+            if (Render.METHOD_TO_CALL.equals(name) && isWriteMethod(decode(StringUtils.substringAfter(pair, "=")))) {
                 return true;
             }
         }
