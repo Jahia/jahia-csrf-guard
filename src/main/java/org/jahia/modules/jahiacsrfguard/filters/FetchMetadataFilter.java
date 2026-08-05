@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 /**
@@ -57,11 +58,11 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     /** URLs reached from another site by design: an identity provider posts its assertion back to Jahia on *.saml */
     private static final List<Pattern> BUILT_IN_WHITELIST = Collections.singletonList(JahiaCsrfGuardConfig.createUrlPattern("*.saml"));
 
-    // volatile for safe cross-thread publication: configs is re-bound (DYNAMIC reference) while request threads read
-    // it, globalConfig is set once before activation. Every write is an unconditional assignment, so a plain volatile
-    // field is enough here (no compare-and-set) and keeps this filter consistent with CsrfGuardServletFilterWrapper.
-    private volatile JahiaCsrfGuardGlobalConfig globalConfig;
-    private volatile Collection<JahiaCsrfGuardConfig> configs = new HashSet<>();
+    // AtomicReference (a thread-safe type) rather than a volatile reference: configs is re-bound (DYNAMIC reference)
+    // while request threads read it, globalConfig is set once before activation. A volatile non-primitive field
+    // publishes only the reference, not the referenced state, which Sonar flags (java:S3077).
+    private final AtomicReference<JahiaCsrfGuardGlobalConfig> globalConfig = new AtomicReference<>();
+    private final AtomicReference<Collection<JahiaCsrfGuardConfig>> configs = new AtomicReference<>(new HashSet<>());
 
     @Activate
     public void activate() {
@@ -99,7 +100,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     }
 
     boolean isRejected(HttpServletRequest request) {
-        JahiaCsrfGuardGlobalConfig currentGlobalConfig = globalConfig;
+        JahiaCsrfGuardGlobalConfig currentGlobalConfig = globalConfig.get();
         return currentGlobalConfig != null && currentGlobalConfig.isEnabled() && currentGlobalConfig.isCrossSiteWriteProtectionEnabled()
                 && isCrossSite(request.getHeader(SEC_FETCH_SITE_HEADER))
                 && isWriteRequest(request)
@@ -168,7 +169,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
      * predate it.
      */
     private boolean isFiltered(ServletRequest request) {
-        Collection<JahiaCsrfGuardConfig> currentConfigs = configs;
+        Collection<JahiaCsrfGuardConfig> currentConfigs = configs.get();
         return currentConfigs.stream().noneMatch(JahiaCsrfGuardConfig::hasCrossSiteWriteUrlPatterns)
                 || currentConfigs.stream().anyMatch(config -> config.isCrossSiteWriteFiltered(request));
     }
@@ -180,22 +181,22 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     private boolean isWhiteListed(ServletRequest request) {
         String uri = JahiaCsrfGuardConfig.normalizePath(((HttpServletRequest) request).getRequestURI());
         return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(uri).matches())
-                || configs.stream().anyMatch(config -> config.isCrossSiteWriteWhiteListed(request));
+                || configs.get().stream().anyMatch(config -> config.isCrossSiteWriteWhiteListed(request));
     }
 
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY, unbind = "-")
     public void setGlobalConfig(JahiaCsrfGuardGlobalConfig globalConfig) {
-        this.globalConfig = globalConfig;
+        this.globalConfig.set(globalConfig);
     }
 
     @Reference(service = JahiaCsrfGuardConfigFactory.class, policy = ReferencePolicy.DYNAMIC, bind = "setConfigs", unbind = "clearConfigs")
     public void setConfigs(JahiaCsrfGuardConfigFactory configFactory) {
         LOGGER.debug("Setting configurations from factory: {}", configFactory.getName());
-        this.configs = configFactory.getConfigs();
+        this.configs.set(configFactory.getConfigs());
     }
 
     public void clearConfigs(JahiaCsrfGuardConfigFactory configFactory) {
         LOGGER.debug("Clearing configurations from factory: {}", configFactory.getName());
-        this.configs = new HashSet<>();
+        this.configs.set(new HashSet<>());
     }
 }
