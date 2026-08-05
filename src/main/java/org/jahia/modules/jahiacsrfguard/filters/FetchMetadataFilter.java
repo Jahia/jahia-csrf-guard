@@ -39,8 +39,8 @@ import java.util.regex.Pattern;
  * own so that the policy never triggers request body parsing, which the request encoding depends on.
  * <p>
  * The policy covers every URL except the ones it exempts itself, and both are configurable through the
- * {@code fetchMetadataUrlPatterns} and {@code fetchMetadataWhitelist} properties of any
- * {@code org.jahia.modules.jahiacsrfguard-*} configuration; {@code jahia.csrf-guard.fetchMetadata.enabled} drives the
+ * {@code crossSiteWriteUrlPatterns} and {@code crossSiteWriteWhitelist} properties of any
+ * {@code org.jahia.modules.jahiacsrfguard-*} configuration; {@code jahia.csrf-guard.crossSiteWriteProtection.enabled} drives the
  * policy as a whole.
  */
 @Component(immediate = true, service = AbstractServletFilter.class)
@@ -100,7 +100,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
 
     boolean isRejected(HttpServletRequest request) {
         JahiaCsrfGuardGlobalConfig currentGlobalConfig = globalConfig;
-        return currentGlobalConfig != null && currentGlobalConfig.isEnabled() && currentGlobalConfig.isFetchMetadataEnabled()
+        return currentGlobalConfig != null && currentGlobalConfig.isEnabled() && currentGlobalConfig.isCrossSiteWriteProtectionEnabled()
                 && isCrossSite(request.getHeader(SEC_FETCH_SITE_HEADER))
                 && isWriteRequest(request)
                 && isFiltered(request) && !isWhiteListed(request);
@@ -169,8 +169,8 @@ public class FetchMetadataFilter extends AbstractServletFilter {
      */
     private boolean isFiltered(ServletRequest request) {
         Collection<JahiaCsrfGuardConfig> currentConfigs = configs;
-        return currentConfigs.stream().noneMatch(JahiaCsrfGuardConfig::hasFetchMetadataUrlPatterns)
-                || currentConfigs.stream().anyMatch(config -> config.isFetchMetadataFiltered(request));
+        return currentConfigs.stream().noneMatch(JahiaCsrfGuardConfig::hasCrossSiteWriteUrlPatterns)
+                || currentConfigs.stream().anyMatch(config -> config.isCrossSiteWriteFiltered(request));
     }
 
     /**
@@ -180,7 +180,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
     private boolean isWhiteListed(ServletRequest request) {
         String uri = JahiaCsrfGuardConfig.normalizePath(((HttpServletRequest) request).getRequestURI());
         return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(uri).matches())
-                || configs.stream().anyMatch(config -> config.isFetchMetadataWhiteListed(request));
+                || configs.stream().anyMatch(config -> config.isCrossSiteWriteWhiteListed(request));
     }
 
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, cardinality = ReferenceCardinality.MANDATORY, unbind = "-")

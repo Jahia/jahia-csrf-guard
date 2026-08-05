@@ -154,7 +154,7 @@ public class FetchMetadataFilterTest {
 
     @Test
     public void policyOffServesEverything() {
-        filter.setGlobalConfig(globalConfig(Map.of(JahiaCsrfGuardGlobalConfig.FETCH_METADATA_ENABLED, "false")));
+        filter.setGlobalConfig(globalConfig(Map.of(JahiaCsrfGuardGlobalConfig.CROSS_SITE_WRITE_PROTECTION_ENABLED, "false")));
         assertFalse(filter.isRejected(request("POST", RENDER_URI, null, "cross-site")));
     }
 
@@ -197,10 +197,10 @@ public class FetchMetadataFilterTest {
     private static JahiaCsrfGuardConfigFactory configFactory(String urlPatterns, String whitelist) {
         Dictionary<String, Object> properties = new Hashtable<>();
         if (urlPatterns != null) {
-            properties.put(JahiaCsrfGuardConfig.FETCH_METADATA_URL_PATTERNS, urlPatterns);
+            properties.put(JahiaCsrfGuardConfig.CROSS_SITE_WRITE_URL_PATTERNS, urlPatterns);
         }
         if (whitelist != null) {
-            properties.put(JahiaCsrfGuardConfig.FETCH_METADATA_WHITELIST, whitelist);
+            properties.put(JahiaCsrfGuardConfig.CROSS_SITE_WRITE_WHITELIST, whitelist);
         }
         JahiaCsrfGuardConfigFactory factory = new JahiaCsrfGuardConfigFactory();
         try {

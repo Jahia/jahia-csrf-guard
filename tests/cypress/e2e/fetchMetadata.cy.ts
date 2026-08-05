@@ -1,5 +1,5 @@
 import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
-import {updateCsrfGuardFetchMetadataWhiteList} from '../utils/utils';
+import {updateCsrfGuardCrossSiteWriteWhiteList} from '../utils/utils';
 
 describe('Fetch metadata request policy tests', () => {
     const targetSiteKey = 'csrfGuardSite';
@@ -129,14 +129,14 @@ describe('Fetch metadata request policy tests', () => {
     });
 
     it('should exempt a whitelisted url and cover it again once removed', () => {
-        updateCsrfGuardFetchMetadataWhiteList('*.logAction.do');
+        updateCsrfGuardCrossSiteWriteWhiteList('*.logAction.do');
         crossSiteWriteEventuallyAnswers(200);
-        updateCsrfGuardFetchMetadataWhiteList('*.notAnAction.do');
+        updateCsrfGuardCrossSiteWriteWhiteList('*.notAnAction.do');
         crossSiteWriteEventuallyAnswers(403);
     });
 
     after('Clean', () => {
-        updateCsrfGuardFetchMetadataWhiteList('*.notAnAction.do');
+        updateCsrfGuardCrossSiteWriteWhiteList('*.notAnAction.do');
         deleteSite(targetSiteKey);
     });
 });

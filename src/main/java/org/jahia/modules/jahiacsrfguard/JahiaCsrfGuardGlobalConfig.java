@@ -43,7 +43,7 @@ public class JahiaCsrfGuardGlobalConfig {
     public static final String SERVLET_ALIAS = "jahia.csrf-guard.servletAlias";
     public static final String BYPASS_FOR_GUEST = "jahia.csrf-guard.bypassForGuest";
     public static final String RESOLVED_URL_PATTERNS = "jahia.csrf-guard.resolvedUrlPatterns";
-    public static final String FETCH_METADATA_ENABLED = "jahia.csrf-guard.fetchMetadata.enabled";
+    public static final String CROSS_SITE_WRITE_PROTECTION_ENABLED = "jahia.csrf-guard.crossSiteWriteProtection.enabled";
 
     private Map<String, String> config = new HashMap<>();
     private boolean serviceEnabled = true;
@@ -51,7 +51,7 @@ public class JahiaCsrfGuardGlobalConfig {
     private String servletPath = "";
     private boolean bypassForGuest = true;
     private List<String> resolvedUrlPatterns = new ArrayList<>();
-    private boolean fetchMetadataEnabled = true;
+    private boolean crossSiteWriteProtectionEnabled = true;
 
     @Activate
     @Modified
@@ -65,7 +65,7 @@ public class JahiaCsrfGuardGlobalConfig {
         this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ?
                 new ArrayList<>() :
                 List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
-        this.setFetchMetadataEnabled(config.getOrDefault(FETCH_METADATA_ENABLED, "true").equalsIgnoreCase("true"));
+        this.setCrossSiteWriteProtectionEnabled(config.getOrDefault(CROSS_SITE_WRITE_PROTECTION_ENABLED, "true").equalsIgnoreCase("true"));
         LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);
     }
 
@@ -124,12 +124,12 @@ public class JahiaCsrfGuardGlobalConfig {
     /**
      * @return true when write requests are accepted only from the site's own browsing context
      */
-    public boolean isFetchMetadataEnabled() {
-        return fetchMetadataEnabled;
+    public boolean isCrossSiteWriteProtectionEnabled() {
+        return crossSiteWriteProtectionEnabled;
     }
 
-    public void setFetchMetadataEnabled(boolean fetchMetadataEnabled) {
-        this.fetchMetadataEnabled = fetchMetadataEnabled;
+    public void setCrossSiteWriteProtectionEnabled(boolean crossSiteWriteProtectionEnabled) {
+        this.crossSiteWriteProtectionEnabled = crossSiteWriteProtectionEnabled;
     }
 
     @Override public boolean equals(Object o) {
@@ -140,15 +140,15 @@ public class JahiaCsrfGuardGlobalConfig {
         JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
         return serviceEnabled == that.serviceEnabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
                 && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
-                && fetchMetadataEnabled == that.fetchMetadataEnabled;
+                && crossSiteWriteProtectionEnabled == that.crossSiteWriteProtectionEnabled;
     }
 
     @Override public int hashCode() {
-        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, fetchMetadataEnabled);
+        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, crossSiteWriteProtectionEnabled);
     }
 
     @Override public String toString() {
         return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + serviceEnabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
-                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + ", fetchMetadataEnabled=" + fetchMetadataEnabled + '}';
+                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + ", crossSiteWriteProtectionEnabled=" + crossSiteWriteProtectionEnabled + '}';
     }
 }

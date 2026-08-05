@@ -36,14 +36,14 @@ public class JahiaCsrfGuardConfig {
 
     public static final String URL_PATTERNS = "urlPatterns";
     public static final String WHITELIST = "whitelist";
-    public static final String FETCH_METADATA_URL_PATTERNS = "fetchMetadataUrlPatterns";
-    public static final String FETCH_METADATA_WHITELIST = "fetchMetadataWhitelist";
+    public static final String CROSS_SITE_WRITE_URL_PATTERNS = "crossSiteWriteUrlPatterns";
+    public static final String CROSS_SITE_WRITE_WHITELIST = "crossSiteWriteWhitelist";
 
     private String pid;
     private List<Pattern> urlPatterns;
     private List<Pattern> whitelistPatterns;
-    private List<Pattern> fetchMetadataUrlPatterns;
-    private List<Pattern> fetchMetadataWhitelistPatterns;
+    private List<Pattern> crossSiteWriteUrlPatterns;
+    private List<Pattern> crossSiteWriteWhitelistPatterns;
 
     public JahiaCsrfGuardConfig() {
     }
@@ -60,13 +60,13 @@ public class JahiaCsrfGuardConfig {
         if (StringUtils.isNotEmpty(whitelist)) {
             config.setWhitelist(whitelist);
         }
-        String fetchMetadataUrlPatterns = (String) properties.get(FETCH_METADATA_URL_PATTERNS);
-        if (StringUtils.isNotEmpty(fetchMetadataUrlPatterns)) {
-            config.setFetchMetadataUrlPatterns(fetchMetadataUrlPatterns);
+        String crossSiteWriteUrlPatterns = (String) properties.get(CROSS_SITE_WRITE_URL_PATTERNS);
+        if (StringUtils.isNotEmpty(crossSiteWriteUrlPatterns)) {
+            config.setCrossSiteWriteUrlPatterns(crossSiteWriteUrlPatterns);
         }
-        String fetchMetadataWhitelist = (String) properties.get(FETCH_METADATA_WHITELIST);
-        if (StringUtils.isNotEmpty(fetchMetadataWhitelist)) {
-            config.setFetchMetadataWhitelist(fetchMetadataWhitelist);
+        String crossSiteWriteWhitelist = (String) properties.get(CROSS_SITE_WRITE_WHITELIST);
+        if (StringUtils.isNotEmpty(crossSiteWriteWhitelist)) {
+            config.setCrossSiteWriteWhitelist(crossSiteWriteWhitelist);
         }
         return config;
     }
@@ -79,12 +79,12 @@ public class JahiaCsrfGuardConfig {
         this.whitelistPatterns = compile(whitelist);
     }
 
-    public void setFetchMetadataUrlPatterns(String fetchMetadataUrlPatterns) {
-        this.fetchMetadataUrlPatterns = compile(fetchMetadataUrlPatterns);
+    public void setCrossSiteWriteUrlPatterns(String crossSiteWriteUrlPatterns) {
+        this.crossSiteWriteUrlPatterns = compile(crossSiteWriteUrlPatterns);
     }
 
-    public void setFetchMetadataWhitelist(String fetchMetadataWhitelist) {
-        this.fetchMetadataWhitelistPatterns = compile(fetchMetadataWhitelist);
+    public void setCrossSiteWriteWhitelist(String crossSiteWriteWhitelist) {
+        this.crossSiteWriteWhitelistPatterns = compile(crossSiteWriteWhitelist);
     }
 
     private static List<Pattern> compile(String patterns) {
@@ -128,8 +128,8 @@ public class JahiaCsrfGuardConfig {
     /**
      * @return true if this configuration sets the scope of the fetch metadata request policy
      */
-    public boolean hasFetchMetadataUrlPatterns() {
-        return fetchMetadataUrlPatterns != null;
+    public boolean hasCrossSiteWriteUrlPatterns() {
+        return crossSiteWriteUrlPatterns != null;
     }
 
     /**
@@ -137,8 +137,8 @@ public class JahiaCsrfGuardConfig {
      * @param request client request object for servlet
      * @return true if the policy should be applied
      */
-    public boolean isFetchMetadataFiltered(ServletRequest request) {
-        return matches(fetchMetadataUrlPatterns, request);
+    public boolean isCrossSiteWriteFiltered(ServletRequest request) {
+        return matches(crossSiteWriteUrlPatterns, request);
     }
 
     /**
@@ -146,8 +146,8 @@ public class JahiaCsrfGuardConfig {
      * @param request client request object for servlet
      * @return true if URL is whitelisted, so the policy should not be applied
      */
-    public boolean isFetchMetadataWhiteListed(ServletRequest request) {
-        return matches(fetchMetadataWhitelistPatterns, request);
+    public boolean isCrossSiteWriteWhiteListed(ServletRequest request) {
+        return matches(crossSiteWriteWhitelistPatterns, request);
     }
 
     private static boolean matches(List<Pattern> patterns, ServletRequest request) {

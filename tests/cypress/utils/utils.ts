@@ -22,12 +22,12 @@ export const updateCsrfGuardWhiteListConfig = (whitelist?: string) => {
     }
 };
 
-export const updateCsrfGuardFetchMetadataWhiteList = (whitelist: string) => {
+export const updateCsrfGuardCrossSiteWriteWhiteList = (whitelist: string) => {
     const conf = {
         editConfiguration: 'org.jahia.modules.jahiacsrfguard-dummy',
         configIdentifier: 'global',
         properties: {
-            fetchMetadataWhitelist: whitelist
+            crossSiteWriteWhitelist: whitelist
         }
     };
 

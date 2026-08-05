@@ -123,16 +123,16 @@ Because the policy keys off a header the browser must send, it complements token
 
 #### Allowing a URL to be reached from another site
 
-Some URLs are reached from another site by design — an identity provider posting an assertion back to Jahia, or a service posting a notification. The SAML callback (`*.saml`) is always exempt; any other URL is exempted by listing it in the `fetchMetadataWhitelist` property of a module configuration, for instance in `src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-test-module.cfg`:
+Some URLs are reached from another site by design — an identity provider posting an assertion back to Jahia, or a service posting a notification. The SAML callback (`*.saml`) is always exempt; any other URL is exempted by listing it in the `crossSiteWriteWhitelist` property of a module configuration, for instance in `src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-test-module.cfg`:
 
 ```
-fetchMetadataWhitelist = /my-module/notifications/*
+crossSiteWriteWhitelist = /my-module/notifications/*
 ```
 
-The policy covers all URLs; the `fetchMetadataUrlPatterns` property narrows it down to the URLs you list:
+The policy covers all URLs; the `crossSiteWriteUrlPatterns` property narrows it down to the URLs you list:
 
 ```
-fetchMetadataUrlPatterns = /cms/*, /en/sites/mysite/*
+crossSiteWriteUrlPatterns = /cms/*, /en/sites/mysite/*
 ```
 
 > **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches its original URI. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
@@ -144,7 +144,7 @@ Both properties accept the same comma-separated URL patterns as `urlPatterns` an
 The policy can be turned off in `/karaf/etc/org.jahia.modules.jahiacsrfguard.global.cfg`:
 
 ```
-jahia.csrf-guard.fetchMetadata.enabled = false
+jahia.csrf-guard.crossSiteWriteProtection.enabled = false
 ```
 
 :::info
