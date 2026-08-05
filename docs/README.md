@@ -114,7 +114,7 @@ Alongside token validation, the module applies a fetch metadata request policy: 
 Modern browsers describe the initiator of every request in the [`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site) request header, and a page cannot alter it. When that header holds `cross-site` and the request writes content, Jahia answers `403` and logs:
 
 ```
-WARN  [FetchMetadataFilter] - Rejected request (ip:..., method:POST, uri:..., Sec-Fetch-Site:cross-site, Origin:https://attacker.example)
+WARN  [FetchMetadataFilter] - Rejected request (ip:..., method:POST, uri:..., Sec-Fetch-Site:cross-site, Origin:https://other-website.com)
 ```
 
 A request writes content when its HTTP method is `POST`, `PUT`, `DELETE` or `PATCH`, or when it asks Jahia to act upon one of those methods through the `jcrMethodToCall` query parameter. Requests that only read, requests whose initiator is the site itself (`same-origin`, `same-site`), requests the user started themselves (`none`) and requests carrying no such header (non-browser clients, for instance a script or a server-to-server call) are served as usual.
@@ -146,6 +146,10 @@ The policy can be turned off in `/karaf/etc/org.jahia.modules.jahiacsrfguard.glo
 ```
 jahia.csrf-guard.crossSiteWriteProtection.enabled = false
 ```
+
+:::warning
+Disabling the policy removes the cross-site write protection layer: content-writing requests the browser reports as `cross-site` are no longer answered with `403`. Only token validation is left to guard against cross-site requests, so turn this off only when you have a specific reason to and understand the exposure.
+:::
 
 :::info
 Only browsers send `Sec-Fetch-*` headers, so this policy complements token validation rather than replacing it. Check that your reverse proxy forwards request headers it does not know, otherwise the policy has nothing to read.
