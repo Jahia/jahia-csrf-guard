@@ -1,5 +1,5 @@
 import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
-import {updateCsrfGuardFetchMetadataEnabled} from '../utils/utils';
+import {updateCsrfGuardFetchMetadataWhiteList} from '../utils/utils';
 
 describe('Fetch metadata request policy tests', () => {
     const targetSiteKey = 'csrfGuardSite';
@@ -90,6 +90,35 @@ describe('Fetch metadata request policy tests', () => {
         }).its('status').should('equal', 403);
     });
 
+    // The policy keys on the request shape, not on what the request writes: a content-creation request
+    // through the render pipeline is served or refused on the same terms as any other write, whatever
+    // node type it carries.
+    const createChildUrl = '/cms/render/default/en/sites/' + targetSiteKey + '/home/pagecontent';
+
+    it('should serve a content-creation request reported as same-origin', () => {
+        cy.request({
+            method: 'POST',
+            url: createChildUrl,
+            form: true,
+            body: {jcrNodeType: 'jnt:contentList', nodeName: 'sameOriginChild'},
+            headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'same-origin'},
+            followRedirect: false,
+            failOnStatusCode: false
+        }).its('status').should('be.oneOf', [200, 201, 303]);
+    });
+
+    it('should reject a cross-site content-creation request whatever node type it carries', () => {
+        cy.request({
+            method: 'POST',
+            url: createChildUrl,
+            form: true,
+            body: {jcrNodeType: 'jnt:contentList', nodeName: 'crossSiteChild'},
+            headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'cross-site'},
+            followRedirect: false,
+            failOnStatusCode: false
+        }).its('status').should('equal', 403);
+    });
+
     it('should serve a cross-site read request', () => {
         cy.request({
             method: 'GET',
@@ -99,15 +128,15 @@ describe('Fetch metadata request policy tests', () => {
         }).its('status').should('equal', 200);
     });
 
-    it('should follow the configuration switch', () => {
-        updateCsrfGuardFetchMetadataEnabled(false);
+    it('should exempt a whitelisted url and cover it again once removed', () => {
+        updateCsrfGuardFetchMetadataWhiteList('*.logAction.do');
         crossSiteWriteEventuallyAnswers(200);
-        updateCsrfGuardFetchMetadataEnabled(true);
+        updateCsrfGuardFetchMetadataWhiteList('*.notAnAction.do');
         crossSiteWriteEventuallyAnswers(403);
     });
 
     after('Clean', () => {
-        updateCsrfGuardFetchMetadataEnabled(true);
+        updateCsrfGuardFetchMetadataWhiteList('*.notAnAction.do');
         deleteSite(targetSiteKey);
     });
 });

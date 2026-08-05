@@ -22,12 +22,12 @@ export const updateCsrfGuardWhiteListConfig = (whitelist?: string) => {
     }
 };
 
-export const updateCsrfGuardFetchMetadataEnabled = (enabled: boolean) => {
+export const updateCsrfGuardFetchMetadataWhiteList = (whitelist: string) => {
     const conf = {
-        editConfiguration: 'org.jahia.modules.jahiacsrfguard.global',
+        editConfiguration: 'org.jahia.modules.jahiacsrfguard-dummy',
         configIdentifier: 'global',
         properties: {
-            'jahia.csrf-guard.fetchMetadata.enabled': String(enabled)
+            fetchMetadataWhitelist: whitelist
         }
     };
 
