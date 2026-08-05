@@ -173,7 +173,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
      * bypassed for the current request
      */
     private boolean isWhiteListed(ServletRequest request) {
-        String uri = ((HttpServletRequest) request).getRequestURI();
+        String uri = JahiaCsrfGuardConfig.normalizePath(((HttpServletRequest) request).getRequestURI());
         return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(uri).matches())
                 || configs.get().stream().anyMatch(config -> config.isFetchMetadataWhiteListed(request));
     }

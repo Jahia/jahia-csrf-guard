@@ -135,6 +135,17 @@ public class FetchMetadataFilterTest {
     }
 
     @Test
+    public void matrixParameterCannotForgeAWhitelistedUrl() {
+        // /home.html ends in .saml only through a matrix parameter Jahia's Render dispatch drops before writing home.html
+        assertTrue(filter.isRejected(request("POST", "/sites/site/home.html;x=.saml", "jcrMethodToCall=put", "cross-site")));
+    }
+
+    @Test
+    public void matrixParameterDoesNotHideAGenuinelyWhitelistedUrl() {
+        assertFalse(filter.isRejected(request("POST", "/sites/site/home.callback.saml;jsessionid=abc", null, "cross-site")));
+    }
+
+    @Test
     public void urlOutOfScopeIsServed() {
         filter.setConfigs(configFactory("/cms/*", null));
         assertTrue(filter.isRejected(request("POST", "/cms/render/live/fr/home", null, "cross-site")));

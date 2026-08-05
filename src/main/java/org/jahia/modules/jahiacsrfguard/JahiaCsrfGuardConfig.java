@@ -154,8 +154,21 @@ public class JahiaCsrfGuardConfig {
         if (patterns == null) {
             return false;
         }
-        String uri = ((HttpServletRequest) request).getRequestURI();
+        String uri = normalizePath(((HttpServletRequest) request).getRequestURI());
         return patterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+    }
+
+    /**
+     * Strip the matrix parameters from every segment of a request URI, so a pattern is matched against the path Jahia
+     * resolves rather than the raw URI. Without this, a cross-site write to {@code /home.html;x=.saml} would end in
+     * {@code .saml}, match a {@code *.saml} whitelist and bypass the policy, while Jahia's Render dispatch drops the
+     * matrix parameter and still writes {@code /home.html}. The query string is not part of the URI, so it is untouched.
+     *
+     * @param uri a raw request URI, may be null
+     * @return the URI with each segment's {@code ;matrix=params} removed
+     */
+    public static String normalizePath(String uri) {
+        return uri == null ? "" : uri.replaceAll(";[^/]*", "");
     }
 
     @Override
