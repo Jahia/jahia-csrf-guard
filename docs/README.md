@@ -107,6 +107,54 @@ The usage of tokens per-page can be deactivated in Jahia 8.1+ by setting the fol
 org.owasp.csrfguard.TokenPerPage = false
 ```
 
+### Fetch metadata request policy
+
+Alongside token validation, the module applies a fetch metadata request policy: a request that writes content is served only when the browser reports it as coming from the site's own browsing context.
+
+Modern browsers describe the initiator of every request in the [`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site) request header, and a page cannot alter it. When that header holds `cross-site` and the request writes content, Jahia answers `403` and logs:
+
+```
+WARN  [FetchMetadataFilter] - Rejected request (ip:..., method:POST, uri:..., Sec-Fetch-Site:cross-site, Origin:https://other-website.com)
+```
+
+A request writes content when its HTTP method is `POST`, `PUT`, `DELETE` or `PATCH`, or when it asks Jahia to act upon one of those methods through the `jcrMethodToCall` query parameter. Requests that only read, requests whose initiator is the site itself (`same-origin`, `same-site`), requests the user started themselves (`none`) and requests carrying no such header (non-browser clients, for instance a script or a server-to-server call) are served as usual.
+
+Because the policy keys off a header the browser must send, it complements token validation rather than replacing it. A client that never sends `Sec-Fetch-Site` — a non-browser caller, or a browser predating the header — falls into the header-absent case above and is served; such requests remain covered by token validation.
+
+#### Allowing a URL to be reached from another site
+
+Some URLs are reached from another site by design — an identity provider posting an assertion back to Jahia, or a service posting a notification. The SAML callback (`*.saml`) is always exempt; any other URL is exempted by listing it in the `crossSiteWriteWhitelist` property of a module configuration, for instance in `src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-test-module.cfg`:
+
+```
+crossSiteWriteWhitelist = /my-module/notifications/*
+```
+
+The policy covers all URLs; the `crossSiteWriteUrlPatterns` property narrows it down to the URLs you list:
+
+```
+crossSiteWriteUrlPatterns = /cms/*, /en/sites/mysite/*
+```
+
+> **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches its original URI. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
+
+Both properties accept the same comma-separated URL patterns as `urlPatterns` and `whitelist`, and apply across all sites of the platform.
+
+#### Disabling the policy
+
+The policy can be turned off in `/karaf/etc/org.jahia.modules.jahiacsrfguard.global.cfg`:
+
+```
+jahia.csrf-guard.crossSiteWriteProtection.enabled = false
+```
+
+:::warning
+Disabling the policy removes the cross-site write protection layer: content-writing requests the browser reports as `cross-site` are no longer answered with `403`. Only token validation is left to guard against cross-site requests, so turn this off only when you have a specific reason to and understand the exposure.
+:::
+
+:::info
+Only browsers send `Sec-Fetch-*` headers, so this policy complements token validation rather than replacing it. Check that your reverse proxy forwards request headers it does not know, otherwise the policy has nothing to read.
+:::
+
 ### Caching considerations
 
 Starting from jahia-csrf-guard 4.2.0, CSRF guard javascript injection is disabled for guest users (unauthenticated users) by default.

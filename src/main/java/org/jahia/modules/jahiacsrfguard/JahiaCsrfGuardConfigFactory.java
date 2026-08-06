@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Dynamic configuration to mainly set url patterns to apply CsrfGuardFilter on a request and whitelisting urls, which should be bypassed.
@@ -34,7 +34,10 @@ public class JahiaCsrfGuardConfigFactory implements ManagedServiceFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JahiaCsrfGuardConfigFactory.class);
 
-    private final Map<String, JahiaCsrfGuardConfig> configs = new HashMap<>();
+    // A concurrent map so the live values() view handed to the filters stays safe to iterate on request threads while
+    // ConfigAdmin mutates it through updated()/deleted(): the reference to the factory is bound once and never re-bound
+    // on a configuration change, so the filters keep iterating that same view.
+    private final Map<String, JahiaCsrfGuardConfig> configs = new ConcurrentHashMap<>();
 
     public JahiaCsrfGuardConfigFactory() {
         LOGGER.debug("Creating Jahia CSRF Guard Config Factory");
