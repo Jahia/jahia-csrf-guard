@@ -1,12 +1,12 @@
 # This workflow is triggered every time a change is pushed to any branches
 # Github actions command reference: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-name: On merge to master
+name: On merge to 4_2_x
 
 # The workflow could also be triggered on PRs
 on:
   push:
     branches:
-      - 'master'
+      - '4_2_x'
     tags-ignore:
       - '**'
 
@@ -105,7 +105,7 @@ jobs:
   publish:
     name: Publish module
     needs: build
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/4_2_x'
     runs-on: ubuntu-latest
     env:
       NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}

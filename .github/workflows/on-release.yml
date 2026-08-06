@@ -11,7 +11,4 @@ jobs:
     uses: Jahia/jahia-modules-action/.github/workflows/reusable-release-module.yml@v2
     secrets: inherit
     with:
-      # The release job checks out this branch and releases it, so it has to be the branch the
-      # release targets — "main" for a regular release, a maintenance branch such as 4_2_x for a
-      # patch release. Hardcoding it releases the wrong code under the requested version number.
-      primary_release_branch: ${{ github.event.release.target_commitish }}
+      primary_release_branch: 4_2_x
