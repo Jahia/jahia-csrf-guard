@@ -46,14 +46,16 @@ public class JahiaCsrfGuardGlobalConfig {
     public static final String SERVLET_ALIAS = "jahia.csrf-guard.servletAlias";
     public static final String BYPASS_FOR_GUEST = "jahia.csrf-guard.bypassForGuest";
     public static final String RESOLVED_URL_PATTERNS = "jahia.csrf-guard.resolvedUrlPatterns";
+    public static final String CROSS_SITE_WRITE_PROTECTION_ENABLED = "jahia.csrf-guard.crossSiteWriteProtection.enabled";
 
     private Map<String, String> config = new HashMap<>();
-    private boolean enabled = true;
+    private boolean serviceEnabled = true;
     private String servletAlias = "";
     private String servletPath = "";
     private boolean bypassForGuest = true;
     private List<String> resolvedUrlPatterns = new ArrayList<>();
     private MultipartResolver multipartResolver;
+    private boolean crossSiteWriteProtectionEnabled = true;
 
     @Activate
     @Modified
@@ -68,6 +70,7 @@ public class JahiaCsrfGuardGlobalConfig {
                 new ArrayList<>() :
                 List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
         this.setMultipartResolver(new CommonsMultipartResolver());
+        this.setCrossSiteWriteProtectionEnabled(config.getOrDefault(CROSS_SITE_WRITE_PROTECTION_ENABLED, "true").equalsIgnoreCase("true"));
         LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);
     }
 
@@ -84,11 +87,11 @@ public class JahiaCsrfGuardGlobalConfig {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return serviceEnabled;
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        this.serviceEnabled = enabled;
     }
 
     public String getServletAlias() {
@@ -131,23 +134,35 @@ public class JahiaCsrfGuardGlobalConfig {
         this.multipartResolver = multipartResolver;
     }
 
+    /**
+     * @return true when write requests are accepted only from the site's own browsing context
+     */
+    public boolean isCrossSiteWriteProtectionEnabled() {
+        return crossSiteWriteProtectionEnabled;
+    }
+
+    public void setCrossSiteWriteProtectionEnabled(boolean crossSiteWriteProtectionEnabled) {
+        this.crossSiteWriteProtectionEnabled = crossSiteWriteProtectionEnabled;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
         JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
-        return enabled == that.enabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
+        return serviceEnabled == that.serviceEnabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
                 && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
-                && Objects.equals(multipartResolver, that.multipartResolver);
+                && Objects.equals(multipartResolver, that.multipartResolver)
+                && crossSiteWriteProtectionEnabled == that.crossSiteWriteProtectionEnabled;
     }
 
     @Override public int hashCode() {
-        return Objects.hash(enabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver);
+        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver, crossSiteWriteProtectionEnabled);
     }
 
     @Override public String toString() {
-        return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + enabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
-                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + '}';
+        return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + serviceEnabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
+                + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + ", crossSiteWriteProtectionEnabled=" + crossSiteWriteProtectionEnabled + '}';
     }
 }

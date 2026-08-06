@@ -36,10 +36,14 @@ public class JahiaCsrfGuardConfig {
 
     public static final String URL_PATTERNS = "urlPatterns";
     public static final String WHITELIST = "whitelist";
+    public static final String CROSS_SITE_WRITE_URL_PATTERNS = "crossSiteWriteUrlPatterns";
+    public static final String CROSS_SITE_WRITE_WHITELIST = "crossSiteWriteWhitelist";
 
     private String pid;
     private List<Pattern> urlPatterns;
-    private List<Pattern> whitelist;
+    private List<Pattern> whitelistPatterns;
+    private List<Pattern> crossSiteWriteUrlPatterns;
+    private List<Pattern> crossSiteWriteWhitelistPatterns;
 
     public JahiaCsrfGuardConfig() {
     }
@@ -56,15 +60,35 @@ public class JahiaCsrfGuardConfig {
         if (StringUtils.isNotEmpty(whitelist)) {
             config.setWhitelist(whitelist);
         }
+        String crossSiteWriteUrlPatterns = (String) properties.get(CROSS_SITE_WRITE_URL_PATTERNS);
+        if (StringUtils.isNotEmpty(crossSiteWriteUrlPatterns)) {
+            config.setCrossSiteWriteUrlPatterns(crossSiteWriteUrlPatterns);
+        }
+        String crossSiteWriteWhitelist = (String) properties.get(CROSS_SITE_WRITE_WHITELIST);
+        if (StringUtils.isNotEmpty(crossSiteWriteWhitelist)) {
+            config.setCrossSiteWriteWhitelist(crossSiteWriteWhitelist);
+        }
         return config;
     }
 
     public void setUrlPatterns(String urlPatterns) {
-        this.urlPatterns = Arrays.stream(urlPatterns.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
+        this.urlPatterns = compile(urlPatterns);
     }
 
     public void setWhitelist(String whitelist) {
-        this.whitelist = Arrays.stream(whitelist.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
+        this.whitelistPatterns = compile(whitelist);
+    }
+
+    public void setCrossSiteWriteUrlPatterns(String crossSiteWriteUrlPatterns) {
+        this.crossSiteWriteUrlPatterns = compile(crossSiteWriteUrlPatterns);
+    }
+
+    public void setCrossSiteWriteWhitelist(String crossSiteWriteWhitelist) {
+        this.crossSiteWriteWhitelistPatterns = compile(crossSiteWriteWhitelist);
+    }
+
+    private static List<Pattern> compile(String patterns) {
+        return Arrays.stream(patterns.split(",")).map(String::trim).map(JahiaCsrfGuardConfig::createUrlPattern).collect(Collectors.toList());
     }
 
     /**
@@ -89,12 +113,7 @@ public class JahiaCsrfGuardConfig {
      * @return true if CsrfGuardFilter should be applied
      */
     public boolean isFiltered(ServletRequest request) {
-        if (urlPatterns == null) {
-            return false;
-        }
-
-        String uri = ((HttpServletRequest) request).getRequestURI();
-        return urlPatterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        return matches(urlPatterns, request);
     }
 
     /**
@@ -103,11 +122,53 @@ public class JahiaCsrfGuardConfig {
      * @return true if URL is whitelisted for CsrfGuardFilter, so it should not be applied
      */
     public boolean isWhiteListed(ServletRequest request) {
-        if (whitelist == null) {
+        return matches(whitelistPatterns, request);
+    }
+
+    /**
+     * @return true if this configuration sets the scope of the fetch metadata request policy
+     */
+    public boolean hasCrossSiteWriteUrlPatterns() {
+        return crossSiteWriteUrlPatterns != null;
+    }
+
+    /**
+     * Check url patterns configuration to see whether the fetch metadata request policy applies to the current request
+     * @param request client request object for servlet
+     * @return true if the policy should be applied
+     */
+    public boolean isCrossSiteWriteFiltered(ServletRequest request) {
+        return matches(crossSiteWriteUrlPatterns, request);
+    }
+
+    /**
+     * Check whitelist configuration to see whether the fetch metadata request policy is bypassed for the current request
+     * @param request client request object for servlet
+     * @return true if URL is whitelisted, so the policy should not be applied
+     */
+    public boolean isCrossSiteWriteWhiteListed(ServletRequest request) {
+        return matches(crossSiteWriteWhitelistPatterns, request);
+    }
+
+    private static boolean matches(List<Pattern> patterns, ServletRequest request) {
+        if (patterns == null) {
             return false;
         }
-        String uri = ((HttpServletRequest) request).getRequestURI();
-        return whitelist.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        String uri = normalizePath(((HttpServletRequest) request).getRequestURI());
+        return patterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+    }
+
+    /**
+     * Strip the matrix parameters from every segment of a request URI, so a pattern is matched against the path Jahia
+     * resolves rather than the raw URI. Without this, a cross-site write to {@code /home.html;x=.saml} would end in
+     * {@code .saml}, match a {@code *.saml} whitelist and bypass the policy, while Jahia's Render dispatch drops the
+     * matrix parameter and still writes {@code /home.html}. The query string is not part of the URI, so it is untouched.
+     *
+     * @param uri a raw request URI, may be null
+     * @return the URI with each segment's {@code ;matrix=params} removed
+     */
+    public static String normalizePath(String uri) {
+        return uri == null ? "" : uri.replaceAll(";[^/]*", "");
     }
 
     @Override
