@@ -49,7 +49,7 @@ public class JahiaCsrfGuardGlobalConfig {
     public static final String CROSS_SITE_WRITE_PROTECTION_ENABLED = "jahia.csrf-guard.crossSiteWriteProtection.enabled";
 
     private Map<String, String> config = new HashMap<>();
-    private boolean enabled = true;
+    private boolean serviceEnabled = true;
     private String servletAlias = "";
     private String servletPath = "";
     private boolean bypassForGuest = true;
@@ -87,11 +87,11 @@ public class JahiaCsrfGuardGlobalConfig {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return serviceEnabled;
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        this.serviceEnabled = enabled;
     }
 
     public String getServletAlias() {
@@ -151,18 +151,18 @@ public class JahiaCsrfGuardGlobalConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         JahiaCsrfGuardGlobalConfig that = (JahiaCsrfGuardGlobalConfig) o;
-        return enabled == that.enabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
+        return serviceEnabled == that.serviceEnabled && bypassForGuest == that.bypassForGuest && Objects.equals(servletAlias, that.servletAlias)
                 && Objects.equals(servletPath, that.servletPath) && Objects.equals(resolvedUrlPatterns, that.resolvedUrlPatterns)
                 && Objects.equals(multipartResolver, that.multipartResolver)
                 && crossSiteWriteProtectionEnabled == that.crossSiteWriteProtectionEnabled;
     }
 
     @Override public int hashCode() {
-        return Objects.hash(enabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver, crossSiteWriteProtectionEnabled);
+        return Objects.hash(serviceEnabled, servletAlias, servletPath, bypassForGuest, resolvedUrlPatterns, multipartResolver, crossSiteWriteProtectionEnabled);
     }
 
     @Override public String toString() {
-        return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + enabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
+        return "JahiaCsrfGuardGlobalConfig{" + "enabled=" + serviceEnabled + ", servletPath='" + servletPath + '\'' + ", bypassForGuest="
                 + bypassForGuest + ", resolvedUrlPatterns=" + resolvedUrlPatterns + ", crossSiteWriteProtectionEnabled=" + crossSiteWriteProtectionEnabled + '}';
     }
 }
