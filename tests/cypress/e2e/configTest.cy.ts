@@ -37,7 +37,8 @@ describe('Config CSRF tests', () => {
     it('should decide on a url that only differs by a trailing slash the same way', () => {
         cy.login();
         const actionUrl = '/en/sites/' + targetSiteKey + '/home.logAction.do';
-        // Exempt from token validation: both forms are served
+        // Smoke check — the action answers on both forms of its url. Both are served on any build, so this pair
+        // does not discriminate; the 400s below are the assertion that does.
         cy.request({method: 'POST', url: actionUrl, failOnStatusCode: true}).its('status').should('equal', 200);
         cy.request({method: 'POST', url: actionUrl + '/', failOnStatusCode: true}).its('status').should('equal', 200);
         updateCsrfGuardWhiteListConfig('*.toto.do');
