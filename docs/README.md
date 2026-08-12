@@ -137,7 +137,7 @@ The policy covers all URLs; the `crossSiteWriteUrlPatterns` property narrows it 
 crossSiteWriteUrlPatterns = /cms/*, /en/sites/mysite/*
 ```
 
-> **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches the path the container reads from its original URI — percent-decoded, without the context path, its matrix parameters and any trailing slash. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
+> **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches the path the container reads from its original URI — percent-decoded, context path included, without its matrix parameters and without a trailing slash. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
 
 Both properties accept the same comma-separated URL patterns as `urlPatterns` and `whitelist`, and apply across all sites of the platform.
 
