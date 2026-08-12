@@ -73,6 +73,8 @@ In such cases you would create a configuration in your module and whitelist the 
 whitelist = *.action1.do,*.action2.do
 ```
 
+A pattern is matched against the path the container reads from the request, so the URL forms Jahia serves as one action are covered as one: `*.action1.do` covers `/home.action1.do` and `/home.action1.do/` alike.
+
 You can find an example of such a configuration in the [saml-authentication-valve codebase](https://github.com/Jahia/saml-authentication-valve/blob/dd3b68c1bc7fba48de8eca4444861ac516ec5bc2/src/main/resources/META-INF/configurations/org.jahia.modules.jahiacsrfguard-saml.cfg).
 
 #### Referer check does not match the protocol
@@ -135,7 +137,7 @@ The policy covers all URLs; the `crossSiteWriteUrlPatterns` property narrows it 
 crossSiteWriteUrlPatterns = /cms/*, /en/sites/mysite/*
 ```
 
-> **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches its original URI. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
+> **Write these patterns against the URLs browsers request, not the ones Jahia resolves them to.** The filter runs on the incoming request (`REQUEST` dispatch) and matches the path the container reads from its original URI — percent-decoded, without the context path, its matrix parameters and any trailing slash. A content write to a site URL such as `POST /en/sites/mysite/home/foo` is served through an internal forward to `/cms/render/…`, which this filter never sees — so a scope of `/cms/*` on its own would match only the forwarded path and leave the original request uncovered. List the public entry-point spellings your writes actually use, or keep the default (all URLs), which is the safe choice.
 
 Both properties accept the same comma-separated URL patterns as `urlPatterns` and `whitelist`, and apply across all sites of the platform.
 

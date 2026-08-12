@@ -32,6 +32,22 @@ describe('Config CSRF tests', () => {
         cy.logout();
     });
 
+    // Jahia serves /home.logAction.do/ as the action /home.logAction.do — its resolver drops the trailing slash — so
+    // a configuration that names that action must decide the same way for both forms of its url.
+    it('should decide on a url that only differs by a trailing slash the same way', () => {
+        cy.login();
+        const actionUrl = '/en/sites/' + targetSiteKey + '/home.logAction.do';
+        // exempt from token validation: both forms are served
+        cy.request({method: 'POST', url: actionUrl, failOnStatusCode: true}).its('status').should('equal', 200);
+        cy.request({method: 'POST', url: actionUrl + '/', failOnStatusCode: true}).its('status').should('equal', 200);
+        updateCsrfGuardWhiteListConfig('*.toto.do');
+        // covered by token validation: the plain form answers 400, which is what makes the next line meaningful
+        cy.request({method: 'POST', url: actionUrl, failOnStatusCode: false}).its('status').should('equal', 400);
+        cy.request({method: 'POST', url: actionUrl + '/', failOnStatusCode: false}).its('status').should('equal', 400);
+        updateCsrfGuardWhiteListConfig('*.logAction.do');
+        cy.logout();
+    });
+
     after('Clean', () => {
         updateCsrfGuardWhiteListConfig('*.logAction.do');
         deleteSite(targetSiteKey);
