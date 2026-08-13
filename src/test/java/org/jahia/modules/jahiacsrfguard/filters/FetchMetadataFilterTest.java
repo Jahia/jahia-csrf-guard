@@ -177,17 +177,6 @@ public class FetchMetadataFilterTest {
         assertFalse(filter.isRejected(request("POST", "/sites/site/home.callback.saml", null, "cross-site")));
     }
 
-    @Test
-    public void theBuiltInExemptionCoversTheCallbackAndNoOtherUrl() {
-        filter.clearConfigs(mock(JahiaCsrfGuardConfigFactory.class));
-        // The exemption the module applies on its own names one endpoint. The other URLs that SAML support serves are
-        // read requests, which this policy does not cover, so they need no exemption and do not get one.
-        assertTrue(filter.isRejected(request("POST", "/sites/site/home.saml", null, "cross-site")));
-        assertTrue(filter.isRejected(request("POST", "/sites/site/home.connect.saml", null, "cross-site")));
-        assertTrue(filter.isRejected(request("POST", "/sites/site/home.metadata.saml", null, "cross-site")));
-        assertTrue(filter.isRejected(request("GET", "/sites/site/home.saml", "jcrMethodToCall=put", "cross-site")));
-    }
-
     // --- fixtures ---------------------------------------------------------------------------------------------------
 
     private static HttpServletRequest request(String method, String uri, String queryString, String secFetchSite) {

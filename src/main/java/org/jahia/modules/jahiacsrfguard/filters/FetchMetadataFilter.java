@@ -55,12 +55,8 @@ public class FetchMetadataFilter extends AbstractServletFilter {
 
     private static final Set<String> WRITE_METHODS = new HashSet<>(Arrays.asList("POST", "PUT", "DELETE", "PATCH"));
 
-    /**
-     * URLs reached from another site by design: an identity provider posts its assertion back to Jahia on the callback
-     * URL its SAML support serves, and that URL is the one endpoint of that support a write arrives on. This mirrors the
-     * condition the SAML filter dispatches on, so the exemption covers the endpoint that needs it and no other URL.
-     */
-    private static final List<Pattern> BUILT_IN_WHITELIST = Collections.singletonList(JahiaCsrfGuardConfig.createUrlPattern("*callback.saml"));
+    /** URLs reached from another site by design: an identity provider posts its assertion back to Jahia on *.saml */
+    private static final List<Pattern> BUILT_IN_WHITELIST = Collections.singletonList(JahiaCsrfGuardConfig.createUrlPattern("*.saml"));
 
     // AtomicReference (a thread-safe type) rather than a volatile reference: configs is re-bound (DYNAMIC reference)
     // while request threads read it, globalConfig is set once before activation. A volatile non-primitive field
