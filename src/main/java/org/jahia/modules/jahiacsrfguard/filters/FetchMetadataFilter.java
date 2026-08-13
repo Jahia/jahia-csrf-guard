@@ -183,8 +183,8 @@ public class FetchMetadataFilter extends AbstractServletFilter {
      * bypassed for the current request
      */
     private boolean isWhiteListed(ServletRequest request) {
-        String uri = JahiaCsrfGuardConfig.normalizePath(((HttpServletRequest) request).getRequestURI());
-        return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(uri).matches())
+        String path = JahiaCsrfGuardConfig.resolvedPath((HttpServletRequest) request);
+        return BUILT_IN_WHITELIST.stream().anyMatch(pattern -> pattern.matcher(path).matches())
                 || configs.get().stream().anyMatch(config -> config.isCrossSiteWriteWhiteListed(request));
     }
 

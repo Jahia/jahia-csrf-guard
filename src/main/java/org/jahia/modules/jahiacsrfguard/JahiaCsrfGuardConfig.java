@@ -154,15 +154,61 @@ public class JahiaCsrfGuardConfig {
         if (patterns == null) {
             return false;
         }
-        String uri = normalizePath(((HttpServletRequest) request).getRequestURI());
-        return patterns.stream().anyMatch(pattern -> pattern.matcher(uri).matches());
+        String path = resolvedPath((HttpServletRequest) request);
+        // A pattern is tested against the path and against the path as a directory, because a prefix pattern names its
+        // own root: `/cms/*` compiles to `/cms/.*`, whose shortest match is `/cms/`. Testing both spellings lets such a
+        // pattern select the path it names, whether or not the request spelled the slash.
+        String asDirectory = path.endsWith("/") ? path : path + "/";
+        return patterns.stream().anyMatch(pattern -> pattern.matcher(path).matches() || pattern.matcher(asDirectory).matches());
     }
 
     /**
-     * Strip the matrix parameters from every segment of a request URI, so a pattern is matched against the path Jahia
-     * resolves rather than the raw URI. Without this, a cross-site write to {@code /home.html;x=.saml} would end in
-     * {@code .saml}, match a {@code *.saml} whitelist and bypass the policy, while Jahia's Render dispatch drops the
-     * matrix parameter and still writes {@code /home.html}. The query string is not part of the URI, so it is untouched.
+     * The path a pattern is compared against: the one the container resolved for this request, so that the spellings
+     * Jahia serves as a single resource are matched as a single resource. Jahia's URLResolver drops a trailing slash
+     * before the render pipeline reads a path, which is what makes {@code /home.action.do/} and {@code /home.action.do}
+     * one URL to select, and the same holds for the other spellings the container folds away.
+     * <p>
+     * The servlet path and path info are what the container mapped: percent-decoded, with {@code /./} and repeated
+     * slashes collapsed, {@code /../} resolved and path parameters parsed out. The context path is put back in front of
+     * them, so a pattern keeps being written against the same URL it always was, and trailing slashes are dropped.
+     * <p>
+     * The matrix-parameter strip belongs to the raw URI, and applies only where the raw URI is what gets matched. On the
+     * mapped path a {@code ;} is content the container decoded from a {@code %3B}, part of a segment's name — dropping
+     * from it would cut the path short and take the suffix a pattern selects with it.
+     * <p>
+     * This is the path of the request being filtered. An internal forward, such as the one that serves a site URL
+     * through {@code /cms/render/…}, is a separate dispatch this filter is not registered for and never reads.
+     *
+     * @param request client request object for servlet
+     * @return the path the container resolved, never null
+     */
+    public static String resolvedPath(HttpServletRequest request) {
+        String mapped = StringUtils.defaultString(request.getServletPath()) + StringUtils.defaultString(request.getPathInfo());
+        if (StringUtils.isEmpty(mapped)) {
+            // nothing mapped to read: match the raw URI, where a `;` still delimits path parameters
+            return stripTrailingSlashes(normalizePath(request.getRequestURI()));
+        }
+        return stripTrailingSlashes(StringUtils.defaultString(request.getContextPath()) + mapped);
+    }
+
+    /**
+     * @param path a request path
+     * @return the path without the trailing slashes URLResolver drops, a bare {@code /} kept as is
+     */
+    static String stripTrailingSlashes(String path) {
+        int end = path.length();
+        while (end > 1 && path.charAt(end - 1) == '/') {
+            end--;
+        }
+        return path.substring(0, end);
+    }
+
+    /**
+     * Strip the matrix parameters from every segment of a raw request URI, the step {@link #resolvedPath} applies when a
+     * raw URI is what it has to match.
+     * Without this, a cross-site write to {@code /home.html;x=.saml} would end in {@code .saml}, match a {@code *.saml}
+     * whitelist and bypass the policy, while Jahia's Render dispatch drops the matrix parameter and still writes
+     * {@code /home.html}. The query string is not part of the URI, so it is untouched.
      *
      * @param uri a raw request URI, may be null
      * @return the URI with each segment's {@code ;matrix=params} removed
