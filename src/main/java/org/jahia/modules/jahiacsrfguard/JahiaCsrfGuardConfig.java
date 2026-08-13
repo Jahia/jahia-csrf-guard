@@ -155,7 +155,11 @@ public class JahiaCsrfGuardConfig {
             return false;
         }
         String path = resolvedPath((HttpServletRequest) request);
-        return patterns.stream().anyMatch(pattern -> pattern.matcher(path).matches());
+        // A pattern is tested against the path and against the path as a directory, because a prefix pattern names its
+        // own root: `/cms/*` compiles to `/cms/.*`, whose shortest match is `/cms/`. Testing both spellings lets such a
+        // pattern select the path it names, whether or not the request spelled the slash.
+        String asDirectory = path.endsWith("/") ? path : path + "/";
+        return patterns.stream().anyMatch(pattern -> pattern.matcher(path).matches() || pattern.matcher(asDirectory).matches());
     }
 
     /**

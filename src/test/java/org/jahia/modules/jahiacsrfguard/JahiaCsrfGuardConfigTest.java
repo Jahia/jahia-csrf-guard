@@ -58,6 +58,15 @@ public class JahiaCsrfGuardConfigTest {
     }
 
     @Test
+    public void aPrefixPatternSelectsThePathItNames() {
+        JahiaCsrfGuardConfig config = config(JahiaCsrfGuardConfig.URL_PATTERNS, "/cms/*");
+        assertTrue(config.isFiltered(mapped("/cms", "/render/default/en/sites/site/home.html")));
+        // the two prefix forms docs/README.md gives as examples select the path they name, with or without its slash
+        assertTrue(config.isFiltered(mapped("/cms", "/")));
+        assertTrue(config.isFiltered(mapped("/cms", null)));
+    }
+
+    @Test
     public void matchingCarriesTheContextPath() {
         JahiaCsrfGuardConfig config = config(JahiaCsrfGuardConfig.URL_PATTERNS, "/jahia/cms/*");
         // A deployment under a context path keeps the URLs its patterns were written against
