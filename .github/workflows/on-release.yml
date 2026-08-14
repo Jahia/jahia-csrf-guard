@@ -12,3 +12,4 @@ jobs:
     secrets: inherit
     with:
       primary_release_branch: 4_2_x
+      job_container: 'ghcr.io/jahia/jahia-docker-mvn-cache:8-jdk-noble-mvn-loaded'
