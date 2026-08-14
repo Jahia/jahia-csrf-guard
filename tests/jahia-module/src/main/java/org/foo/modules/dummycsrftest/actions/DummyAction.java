@@ -30,6 +30,7 @@ import org.jahia.bin.ActionResult;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -60,7 +61,7 @@ public class DummyAction extends Action {
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
             JCRSessionWrapper session, Map<String, List<String>> parameters,
-            URLResolver urlResolver) {
+            URLResolver urlResolver) throws JSONException {
         LOGGER.info("** Dummy Action performed! **");
         JSONObject response = new JSONObject();
         response.put("message", "Dummy Action performed!");
