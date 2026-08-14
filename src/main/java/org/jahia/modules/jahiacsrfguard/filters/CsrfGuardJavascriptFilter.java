@@ -39,7 +39,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +65,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         setFilterName("Jahia CSRF Guard Javascript Filter");
         setMatchAllUrls(true);
         setUrlPatterns(new String[]{"/*"});
-        setDispatcherTypes(Set.of(DispatcherType.REQUEST.name(), DispatcherType.FORWARD.name()));
+        setDispatcherTypes(new HashSet<>(Arrays.asList(DispatcherType.REQUEST.name(), DispatcherType.FORWARD.name())));
         setOrder(1.1f);
     }
 

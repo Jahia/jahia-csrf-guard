@@ -68,7 +68,7 @@ public class JahiaCsrfGuardGlobalConfig {
         this.setBypassForGuest(config.getOrDefault(BYPASS_FOR_GUEST, "true").equalsIgnoreCase("true"));
         this.setResolvedUrlPatterns(config.getOrDefault(RESOLVED_URL_PATTERNS, "").isEmpty() ?
                 new ArrayList<>() :
-                List.of(config.get(RESOLVED_URL_PATTERNS).split(",")));
+                Arrays.asList(config.get(RESOLVED_URL_PATTERNS).split(",")));
         this.setMultipartResolver(new CommonsMultipartResolver());
         this.setCrossSiteWriteProtectionEnabled(config.getOrDefault(CROSS_SITE_WRITE_PROTECTION_ENABLED, "true").equalsIgnoreCase("true"));
         LOGGER.debug("Updated Jahia CSRF Guard Global configuration: {}", this);

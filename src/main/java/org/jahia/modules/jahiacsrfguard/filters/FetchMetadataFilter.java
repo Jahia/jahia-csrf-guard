@@ -71,7 +71,7 @@ public class FetchMetadataFilter extends AbstractServletFilter {
         setMatchAllUrls(true);
         setUrlPatterns(new String[] { "/*" });
         // decide on the incoming request, before it is dispatched further and before the error page it may lead to
-        setDispatcherTypes(Set.of(DispatcherType.REQUEST.name()));
+        setDispatcherTypes(Collections.singleton(DispatcherType.REQUEST.name()));
         setOrder(-1.0f);
     }
 
