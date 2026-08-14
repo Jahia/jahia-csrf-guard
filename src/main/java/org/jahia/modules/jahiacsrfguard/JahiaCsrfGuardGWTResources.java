@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Jerome Blanchard
@@ -39,7 +39,7 @@ public class JahiaCsrfGuardGWTResources extends ModuleGWTResources {
     @Reference(service = JahiaCsrfGuardGlobalConfig.class, policy = ReferencePolicy.DYNAMIC, updated = "setConfig")
     private void setConfig(JahiaCsrfGuardGlobalConfig config) {
         if (config != null) {
-            super.setJavascriptResources(List.of(config.getServletPath()));
+            super.setJavascriptResources(Collections.singletonList(config.getServletPath()));
         }
     }
 
