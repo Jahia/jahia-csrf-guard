@@ -172,6 +172,27 @@ public class FetchMetadataFilterTest {
         assertTrue(filter.isRejected(request("POST", "/cms/render/live/fr/home", null, "cross-site")));
     }
 
+    // --- the branch a served request takes: the path the container mapped ---------------------------------------------
+
+    @Test
+    public void onAMappedPathACrossSiteWriteIsRejected() {
+        assertTrue(filter.isRejected(mapped("POST", "/cms", "/render/default/en/sites/site/home", null, "cross-site")));
+        assertTrue(filter.isRejected(mapped("GET", "/cms", "/render/default/en/sites/site/home", "jcrMethodToCall=put", "cross-site")));
+        assertFalse(filter.isRejected(mapped("POST", "/cms", "/render/default/en/sites/site/home", null, "same-origin")));
+    }
+
+    @Test
+    public void onAMappedPathATrailingSlashDoesNotChangeTheDecision() {
+        assertTrue(filter.isRejected(mapped("POST", "/cms", "/render/default/en/sites/site/home/", null, "cross-site")));
+        assertTrue(filter.isRejected(mapped("POST", "/cms", "/render/default/en/sites/site/home//", null, "cross-site")));
+    }
+
+    @Test
+    public void onAMappedPathTheExemptionIsRead() {
+        assertFalse(filter.isRejected(mapped("POST", "", "/sites/site/home.callback.saml", null, "cross-site")));
+        assertFalse(filter.isRejected(mapped("POST", "", "/sites/site/home.callback.saml/", null, "cross-site")));
+    }
+
     @Test
     public void withoutConfigurationTheSamlCallbackIsServed() {
         filter.clearConfigs(mock(JahiaCsrfGuardConfigFactory.class));
@@ -180,10 +201,23 @@ public class FetchMetadataFilterTest {
 
     // --- fixtures ---------------------------------------------------------------------------------------------------
 
+    /** a request the container mapped to no servlet: the policy reads its raw URI */
     private static HttpServletRequest request(String method, String uri, String queryString, String secFetchSite) {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn(method);
         when(request.getRequestURI()).thenReturn(uri);
+        when(request.getQueryString()).thenReturn(queryString);
+        when(request.getHeader(FetchMetadataFilter.SEC_FETCH_SITE_HEADER)).thenReturn(secFetchSite);
+        return request;
+    }
+
+    /** a request as the container mapped it, which is the branch a served request takes */
+    private static HttpServletRequest mapped(String method, String servletPath, String pathInfo, String queryString, String secFetchSite) {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(method);
+        when(request.getContextPath()).thenReturn("");
+        when(request.getServletPath()).thenReturn(servletPath);
+        when(request.getPathInfo()).thenReturn(pathInfo);
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeader(FetchMetadataFilter.SEC_FETCH_SITE_HEADER)).thenReturn(secFetchSite);
         return request;
