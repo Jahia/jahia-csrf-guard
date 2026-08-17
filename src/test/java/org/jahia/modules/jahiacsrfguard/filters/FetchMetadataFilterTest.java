@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class FetchMetadataFilterTest {
     @Before
     public void setUp() {
         filter = new FetchMetadataFilter();
-        filter.setGlobalConfig(globalConfig(Map.of()));
+        filter.setGlobalConfig(globalConfig(Collections.emptyMap()));
         filter.setConfigs(configFactory("/*", "*.saml"));
     }
 
@@ -154,13 +155,13 @@ public class FetchMetadataFilterTest {
 
     @Test
     public void policyOffServesEverything() {
-        filter.setGlobalConfig(globalConfig(Map.of(JahiaCsrfGuardGlobalConfig.CROSS_SITE_WRITE_PROTECTION_ENABLED, "false")));
+        filter.setGlobalConfig(globalConfig(Collections.singletonMap(JahiaCsrfGuardGlobalConfig.CROSS_SITE_WRITE_PROTECTION_ENABLED, "false")));
         assertFalse(filter.isRejected(request("POST", RENDER_URI, null, "cross-site")));
     }
 
     @Test
     public void moduleOffServesEverything() {
-        filter.setGlobalConfig(globalConfig(Map.of(JahiaCsrfGuardGlobalConfig.ENABLED, "false")));
+        filter.setGlobalConfig(globalConfig(Collections.singletonMap(JahiaCsrfGuardGlobalConfig.ENABLED, "false")));
         assertFalse(filter.isRejected(request("POST", RENDER_URI, null, "cross-site")));
     }
 
