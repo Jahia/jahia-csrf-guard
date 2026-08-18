@@ -22,12 +22,12 @@
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>8.1.7.0</version>
+        <version>8.2.1.1</version>
     </parent>
 
     <artifactId>jahia-csrf-guard</artifactId>
     <name>Jahia CSRF Guard</name>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (jahia-csrf-guard) to protect Jahia from CSRF attack.</description>
 
@@ -41,9 +41,8 @@
     <properties>
         <csrfguard.version>4.5.0</csrfguard.version>
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
-        <jahia.plugin.version>6.12</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
-        <jahia-module-signature>MC0CFQCW+DWFs42Lt4b7yBZW1yUmZDlCWgIUSmPmmxtZHg1TdNqojnAqpBVvPjU=</jahia-module-signature>
+        <jahia-module-signature>MCwCFFp48PJ6tKl3a9tTtYjp4EGG7fTnAhQwYwvbUgREJOGryYWHV1/5E9Cfbw==</jahia-module-signature>
     </properties>
 
     <repositories>

@@ -103,12 +103,6 @@ Starting with Jahia 8.2.0, the token per-page implementation is activated by def
 
 Note that it requires testing and possible code changes within custom templates or modules. You should especially check that the back button of the browser or a form re-submit in the same session still works as expected. Issues might also arise AJAX requests to actions are performed during the page initialization phase (see [this discussion](https://github.com/OWASP/www-project-csrfguard/issues/49#issuecomment-1006451596) for hints about possible solutions). 
 
-The usage of tokens per-page can be deactivated in Jahia 8.1+ by setting the following property in /karaf/etc/org.owasp.csrfguard.cfg:
-
-```
-org.owasp.csrfguard.TokenPerPage = false
-```
-
 ### Fetch metadata request policy
 
 Alongside token validation, the module applies a fetch metadata request policy: a request that writes content is served only when the browser reports it as coming from the site's own browsing context.
