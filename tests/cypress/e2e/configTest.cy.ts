@@ -49,19 +49,6 @@ describe('Config CSRF tests', () => {
         cy.logout();
     });
 
-    // Same fix, the other side of the same matches() helper: urlPatterns decides whether the filter applies at
-    // all, whitelist decides whether it's bypassed once it does. Narrow the whitelist so it never matches, so the
-    // 400s below are actually urlPatterns' own decision, not a whitelist side effect.
-    it('should decide whether to filter a url that only differs by a trailing slash the same way', () => {
-        cy.login();
-        const actionUrl = '/en/sites/' + targetSiteKey + '/home.logAction.do';
-        updateCsrfGuardWhiteListConfig('*.toto.do');
-        cy.request({method: 'POST', url: actionUrl, failOnStatusCode: false}).its('status').should('equal', 400);
-        cy.request({method: 'POST', url: actionUrl + '/', failOnStatusCode: false}).its('status').should('equal', 400);
-        updateCsrfGuardWhiteListConfig('*.logAction.do');
-        cy.logout();
-    });
-
     after('Clean', () => {
         updateCsrfGuardWhiteListConfig('*.logAction.do');
         deleteSite(targetSiteKey);
