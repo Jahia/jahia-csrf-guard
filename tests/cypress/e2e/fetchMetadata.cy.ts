@@ -37,10 +37,10 @@ describe('Fetch metadata request policy tests', () => {
      * Repeat the request until it answers the expected status: a configuration change reaches the module through its
      * configuration file, which is read at its own pace.
      */
-    const crossSiteWriteEventuallyAnswers = (expectedStatus: number, remainingAttempts = 25) => {
+    const crossSiteWriteEventuallyAnswers = (url: string, expectedStatus: number, remainingAttempts = 25) => {
         cy.request({
             method: 'POST',
-            url: actionUrl,
+            url,
             headers: {Origin: Cypress.config().baseUrl, 'Sec-Fetch-Site': 'cross-site'},
             failOnStatusCode: false
         }).then(response => {
@@ -49,7 +49,7 @@ describe('Fetch metadata request policy tests', () => {
             } else {
                 // eslint-disable-next-line cypress/no-unnecessary-waiting
                 cy.wait(2000);
-                crossSiteWriteEventuallyAnswers(expectedStatus, remainingAttempts - 1);
+                crossSiteWriteEventuallyAnswers(url, expectedStatus, remainingAttempts - 1);
             }
         });
     };
@@ -130,9 +130,27 @@ describe('Fetch metadata request policy tests', () => {
 
     it('should exempt a whitelisted url and cover it again once removed', () => {
         updateCsrfGuardCrossSiteWriteWhiteList('*.logAction.do');
-        crossSiteWriteEventuallyAnswers(200);
+        crossSiteWriteEventuallyAnswers(actionUrl, 200);
         updateCsrfGuardCrossSiteWriteWhiteList('*.notAnAction.do');
-        crossSiteWriteEventuallyAnswers(403);
+        crossSiteWriteEventuallyAnswers(actionUrl, 403);
+    });
+
+    // Jahia serves /home.logAction.do/ as the action /home.logAction.do — the fetch-metadata policy's own path
+    // resolution must decide the same way for both forms of its url, exempted or not.
+    it('should decide on a cross-site write url that only differs by a trailing slash the same way', () => {
+        updateCsrfGuardCrossSiteWriteWhiteList('*.logAction.do');
+        crossSiteWriteEventuallyAnswers(actionUrl, 200);
+        crossSiteWriteEventuallyAnswers(actionUrl + '/', 200);
+        updateCsrfGuardCrossSiteWriteWhiteList('*.notAnAction.do');
+        crossSiteWriteEventuallyAnswers(actionUrl, 403);
+        crossSiteWriteEventuallyAnswers(actionUrl + '/', 403);
+    });
+
+    // The path-resolution rewrite must not resurrect the bypass a matrix parameter offered before it existed: a
+    // cross-site write ending in the built-in exemption's suffix by way of a matrix parameter, not by naming the
+    // real SAML callback, must still be rejected.
+    it('should not let a matrix parameter borrow the built-in SAML exemption', () => {
+        crossSiteWriteEventuallyAnswers('/en/sites/' + targetSiteKey + '/home.html;x=.callback.saml', 403);
     });
 
     after('Clean', () => {
