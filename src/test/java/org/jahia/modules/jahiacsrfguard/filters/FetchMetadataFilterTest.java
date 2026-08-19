@@ -139,6 +139,7 @@ public class FetchMetadataFilterTest {
     public void matrixParameterCannotForgeAWhitelistedUrl() {
         // /home.html ends in .saml only through a matrix parameter Jahia's Render dispatch drops before writing home.html
         assertTrue(filter.isRejected(request("POST", "/sites/site/home.html;x=.saml", "jcrMethodToCall=put", "cross-site")));
+        assertTrue(filter.isRejected(request("POST", "/sites/site/home.html;x=.callback.saml", "jcrMethodToCall=put", "cross-site")));
     }
 
     @Test
