@@ -42,7 +42,7 @@
         <csrfguard.version>4.5.0</csrfguard.version>
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
         <jahia-module-type>system</jahia-module-type>
-        <jahia-module-signature>MCwCFFp48PJ6tKl3a9tTtYjp4EGG7fTnAhQwYwvbUgREJOGryYWHV1/5E9Cfbw==</jahia-module-signature>
+        <jahia-module-signature>MC0CFDZZOJQV69qDaz0pgueSvq1Gu6YsAhUAlIm+vMOAPaPL8iCuCJnViz5r8PU=</jahia-module-signature>
     </properties>
 
     <repositories>
