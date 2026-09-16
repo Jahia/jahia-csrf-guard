@@ -1,8 +1,8 @@
-import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
+import {addNode, createSite, deleteSite, jfaker, publishAndWaitJobEnding} from '@jahia/cypress';
 import {updateCsrfGuardCrossSiteWriteWhiteList} from '../utils/utils';
 
 describe('Fetch metadata request policy tests', () => {
-    const targetSiteKey = 'csrfGuardSite';
+    const targetSiteKey = 'csrf-' + jfaker.internet.domainWord();
     const actionUrl = '/en/sites/' + targetSiteKey + '/home.logAction.do';
     const pageUrl = '/en/sites/' + targetSiteKey + '/home.html';
 
