@@ -1,8 +1,8 @@
-import {addNode, createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
+import {addNode, createSite, deleteSite, jfaker, publishAndWaitJobEnding} from '@jahia/cypress';
 import {updateCsrfGuardWhiteListConfig} from '../utils/utils';
 
 describe('Config CSRF tests', () => {
-    const targetSiteKey = 'csrfGuardSite';
+    const targetSiteKey = 'csrf-' + jfaker.internet.domainWord();
     before('Create target test site', () => {
         cy.log('Create site ' + targetSiteKey + ' for csrf tests');
         createSite(targetSiteKey, {locale: 'en', templateSet: 'jahia-csrf-guard-test-module', serverName: 'localhost'});

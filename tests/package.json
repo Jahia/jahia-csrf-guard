@@ -11,13 +11,16 @@
   },
   "main": "index.js",
   "license": "MIT",
+  "resolutions": {
+    "@faker-js/faker": "9.9.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
     "@cypress/code-coverage": "^3.9.11",
     "@cypress/webpack-preprocessor": "^5.11.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@jahia/cypress": "^4.5.0",
+    "@jahia/cypress": "^8.5.0",
     "@jahia/eslint-config": "^2.1.2",
     "@types/cypress": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
