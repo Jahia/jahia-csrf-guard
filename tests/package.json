@@ -11,6 +11,9 @@
   },
   "main": "index.js",
   "license": "MIT",
+  "resolutions": {
+    "@faker-js/faker": "9.9.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
