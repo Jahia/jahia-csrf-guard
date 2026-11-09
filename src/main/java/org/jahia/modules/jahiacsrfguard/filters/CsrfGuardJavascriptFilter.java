@@ -99,8 +99,7 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
         }
 
         String originalContent = responseWrapper.toString();
-        int length = httpRequest.getContextPath().length();
-        String requestPath = length > 0 ? httpRequest.getRequestURI().substring(length) : httpRequest.getRequestURI();
+        String requestPath = resolvedPath(httpRequest);
 
         // skip filter if connected user not match configured ones if not html content type of if path from the request or url resolver not match one of the provided patterns.
         if (!matchUser() || !matchHtmlContentType(responseWrapper) || !(matchPattern(requestPath) || matchUrlResolverPattern(httpRequest))) {
@@ -133,6 +132,17 @@ public final class CsrfGuardJavascriptFilter extends AbstractServletFilter {
 
     private boolean matchHtmlContentType(HttpServletResponse response) {
         return StringUtils.contains(response.getContentType(), "text/html");
+    }
+
+    /**
+     * The context-relative path the container routed on, which is what {@link URLResolver#getPath()} also answers. The
+     * raw URI spells a path the mapper folds away, so the two readers of a pattern would otherwise disagree.
+     *
+     * @param request client request object for servlet
+     * @return the path the container resolved, never null
+     */
+    static String resolvedPath(HttpServletRequest request) {
+        return StringUtils.defaultString(request.getServletPath()) + StringUtils.defaultString(request.getPathInfo());
     }
 
     private boolean matchUrlResolverPattern(HttpServletRequest httpRequest) {
